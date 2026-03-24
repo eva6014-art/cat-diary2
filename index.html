@@ -406,11 +406,8 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
     <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="mf-dose" placeholder="0.5ml"></div>
     <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="mf-time" type="time"></div>
   </div>
+  <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="mf-date-pick"></div></div>
   <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="mf-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
-  <div class="two-col">
-    <div class="f-group"><label class="f-label">療程開始</label><div class="date-pick" id="mf-start-pick"></div></div>
-    <div class="f-group"><label class="f-label">療程結束</label><div class="date-pick" id="mf-end-pick"></div></div>
-  </div>
   <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="mf-note" placeholder="飯後服用，連續7天..."></textarea></div>
   <button class="pri-btn" style="background:#7b8ec8" onclick="saveMed()">儲存</button>
 </div></div>
@@ -465,6 +462,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
     <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="sf-dose" placeholder="1/4茶匙"></div>
     <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="sf-time" type="time"></div>
   </div>
+  <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="sf-date-pick"></div></div>
   <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="sf-brand" placeholder="Zesty Paws"></div>
   <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="sf-note" placeholder="觀察到的效果..."></textarea></div>
   <button class="pri-btn" style="background:#b07ab8" onclick="saveSupp()">儲存</button>
@@ -740,8 +738,7 @@ function openModal(type){
     document.getElementById("mf-note").value="";
     document.getElementById("medModalTitle").textContent="💊 新增用藥紀錄";
     editMedIdx=-1;
-    makeDatePick("mf-start-pick",todayStr());
-    makeDatePick("mf-end-pick","");
+    makeDatePick("mf-date-pick",todayStr());
     renderMedQP();
     document.getElementById("m-med").classList.add("open");
   } else if(type==="medPreset"){
@@ -761,6 +758,7 @@ function openModal(type){
     document.getElementById("sf-time").value=t;
     document.getElementById("sf-brand").value="";
     document.getElementById("sf-note").value="";
+    makeDatePick("sf-date-pick",todayStr());
     renderSuppQP();
     document.getElementById("m-supp").classList.add("open");
   } else if(type==="suppPreset"){
@@ -989,7 +987,7 @@ function saveHealth(){
 }
 
 function saveMed(){
-  var l={name:document.getElementById("mf-name").value||"用藥",dose:document.getElementById("mf-dose").value,time:document.getElementById("mf-time").value,method:document.getElementById("mf-method").value,start:getDP("mf-start-pick"),end:getDP("mf-end-pick"),note:document.getElementById("mf-note").value,date:todayStr()};
+  var l={name:document.getElementById("mf-name").value||"用藥",dose:document.getElementById("mf-dose").value,time:document.getElementById("mf-time").value,method:document.getElementById("mf-method").value,note:document.getElementById("mf-note").value,date:getDP("mf-date-pick")||todayStr()};
   if(editMedIdx>=0){med[editMedIdx]=l;}else{med.unshift(l);}
   editMedIdx=-1;closeModal("m-med");saveDB();renderAll();
 }
@@ -1055,7 +1053,7 @@ function savePoop(){
 }
 
 function saveSupp(){
-  var l={name:document.getElementById("sf-name").value||"保健品",type:document.getElementById("sf-type").value,dose:document.getElementById("sf-dose").value,brand:document.getElementById("sf-brand").value,time:document.getElementById("sf-time").value,note:document.getElementById("sf-note").value,date:todayStr()};
+  var l={name:document.getElementById("sf-name").value||"保健品",type:document.getElementById("sf-type").value,dose:document.getElementById("sf-dose").value,brand:document.getElementById("sf-brand").value,time:document.getElementById("sf-time").value,note:document.getElementById("sf-note").value,date:getDP("sf-date-pick")||todayStr()};
   supp.unshift(l);
   var found=false;
   for(var i=0;i<suppList.length;i++){if(suppList[i].name===l.name){found=true;break;}}
