@@ -275,7 +275,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
     </div>
   </div>
   <div id="medSchedules"></div>
-  <div class="sec-sub" style="margin-bottom:8px;margin-top:4px">今日用藥打卡</div>
+  <div class="sec-sub" style="margin-bottom:8px;margin-top:8px">今日用藥打卡</div>
   <div class="supp-grid" id="medCheckinGrid"></div>
   <div class="sec-sub" style="margin-bottom:8px">給藥紀錄</div>
   <div id="dateRangeMed"></div>
@@ -521,6 +521,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 <script>
 
+
 var KEY="nekoDiary_v5";
 var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","其他":"🌿"};
 var VSTAT={done:{label:"已完成",color:"#7a9e87",bg:"#e8f0ea"},upcoming:{label:"即將到期",color:"#e07e6a",bg:"#fceee8"},due:{label:"建議預約",color:"#d97706",bg:"#fef3c7"}};
@@ -565,11 +566,22 @@ function checkDailyReset(){
   var lastDay=localStorage.getItem("lastDay");
   var today=todayStr();
   if(lastDay!==today){
+    // New day - reset all checkins
     suppList.forEach(function(s){s.doneToday=false;});
     medCheckin={};
     localStorage.setItem("lastDay",today);
     localStorage.setItem("medCheckin","{}");
     saveDB();
+  } else {
+    // Same day - sync doneToday with actual supp logs
+    suppList.forEach(function(s){
+      s.doneToday=supp.some(function(l){return l.date===today&&l.name===s.name;});
+    });
+    // sync medCheckin with actual med logs
+    var todayMedNames={};
+    med.forEach(function(l){if(l.date===today&&l.method==="打卡")todayMedNames[l.name]=l.time;});
+    medCheckin=todayMedNames;
+    localStorage.setItem("medCheckin",JSON.stringify(medCheckin));
   }
 }
 
@@ -1067,26 +1079,23 @@ function renderMedCheckin(){
   var el=document.getElementById("medCheckinGrid");
   if(!el)return;
   while(el.firstChild)el.removeChild(el.firstChild);
-  var ongoingMeds=med.filter(function(m){return m.end&&m.end>=todayStr();});
-  // also include mPre items that are used recently
-  var allMedNames={};
-  ongoingMeds.forEach(function(m){allMedNames[m.name]=true;});
-  var names=Object.keys(allMedNames);
-  if(!names.length){
+  // Use mPre (常用清單) as the checkin list, just like suppList for supplements
+  if(!mPre.length){
     var d=document.createElement("div");
     d.style.cssText="color:#b0aa9f;font-size:12px;grid-column:1/-1;text-align:center;padding:12px";
-    d.textContent="新增進行中療程後顯示打卡";
+    d.textContent="在「常用清單」新增藥品後顯示打卡";
     el.appendChild(d);return;
   }
-  names.forEach(function(name){
+  mPre.forEach(function(p){
+    var name=p.name;
     var done=!!medCheckin[name];
     var card=document.createElement("div");card.className="supp-card";
     card.innerHTML="<div class='supp-icon' style='background:#eef0fa'>💊</div>"
       +"<div style='font-size:12px;font-weight:500;margin-bottom:3px'>"+esc(name)+"</div>"
-      +"<div style='font-size:10px;color:#b0aa9f;margin-bottom:8px'>進行中療程</div>";
+      +"<div style='font-size:10px;color:#b0aa9f;margin-bottom:8px'>"+esc(p.dose||"")+"</div>";
     var chk=document.createElement("div");
     chk.className="supp-check"+(done?" done":"");
-    chk.style.background=done?"#7b8ec8":"";
+    chk.style.cssText=done?"background:#7b8ec8;color:white":"";
     chk.textContent=done?"✓ 已給藥":"＋ 打卡";
     chk.onclick=(function(n){return function(){toggleMedCheckin(n);};})(name);
     card.appendChild(chk);el.appendChild(card);
@@ -1220,9 +1229,7 @@ function renderMed(){
   var ongoing=[];
   for(var i=0;i<med.length;i++){if(med[i].end&&med[i].end>=todayStr())ongoing.push(med[i]);}
   var el=clearEl("medSchedules");
-  if(!ongoing.length){
-    var d=document.createElement("div");d.style.cssText="background:#e8f0ea;border-radius:10px;padding:10px 12px;font-size:12px;color:#7a9e87;margin-bottom:8px";d.textContent="✅ 目前無進行中療程";el.appendChild(d);
-  } else {
+  if(ongoing.length){
     ongoing.forEach(function(m){
       var s=new Date(m.start+"T12:00:00"),e=new Date(m.end+"T12:00:00");
       var total=Math.max(1,Math.round((e-s)/86400000));
@@ -1420,6 +1427,7 @@ function renderAll(){
   if(currentTab===6)renderStats();
 }
 renderAll();
+
 
 
 </script>
