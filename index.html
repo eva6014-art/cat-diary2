@@ -156,7 +156,20 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 .confirm-ok{padding:12px 0;background:#e07e6a;border:none;border-radius:10px;font-family:inherit;font-size:14px;color:white;font-weight:500;cursor:pointer}
 /* weight hint */
 .wt-hint{background:#e8f0ea;border-radius:8px;padding:8px 10px;font-size:11px;color:#7a9e87;margin-bottom:10px}
+
+/* reminder cards */
+.remind-card{border-radius:10px;padding:10px 13px;font-size:12px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.remind-card.warn{background:#fceee8;color:#e07e6a}
+.remind-card.info{background:#e8f0ea;color:#7a9e87}
+.remind-card.blue{background:#eef0fa;color:#7b8ec8}
+/* search bar */
+.search-bar{width:100%;padding:9px 13px;border:1.5px solid #e4dfd8;border-radius:10px;font-family:inherit;font-size:13px;color:#2d2a26;background:#fdfbf8;outline:none;margin-bottom:12px}
+/* weight input row */
+.wt-input-row{display:flex;gap:8px;align-items:center;margin-top:6px}
+.wt-input-row input{flex:1;padding:9px 12px;border:1.5px solid #e4dfd8;border-radius:10px;font-size:18px;font-family:serif;color:#7a9e87;background:#f5f2ee;outline:none;text-align:center}
+.wt-input-row span{font-size:13px;color:#7a766f}
 </style>
+
 </head>
 <body>
 <div class="app">
@@ -198,6 +211,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 <!-- HOME -->
 
 <div class="sec on" id="sec-0">
+  <div id="reminders"></div>
   <div class="today-note"><span>✨</span><span id="homeNote">今天是美好的一天！</span></div>
   <div class="grid2">
     <div class="card"><div class="stat-label">今日進食</div><div class="stat-val" id="homeFoodCnt">0<span class="stat-unit">餐</span></div><div class="stat-sub">點飲食 + 新增</div></div>
@@ -228,6 +242,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
       <button class="circ-btn" onclick="openModal('food')">+</button>
     </div>
   </div>
+  <input class="search-bar" id="foodSearch" placeholder="🔍 搜尋飲食紀錄..." oninput="renderFood()">
   <div id="foodLogs"></div>
 </div>
 
@@ -241,6 +256,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
   <div class="sec-sub" style="margin-bottom:8px">疫苗時間軸</div>
   <div class="timeline" id="vaccineTimeline"></div>
   <div class="sec-sub" style="margin-bottom:8px">健康紀錄</div>
+  <input class="search-bar" id="healthSearch" placeholder="🔍 搜尋健康紀錄..." oninput="renderHealth()">
   <div id="healthLogs"></div>
 </div>
 
@@ -256,6 +272,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
   </div>
   <div id="medSchedules"></div>
   <div class="sec-sub" style="margin-bottom:8px;margin-top:4px">給藥紀錄</div>
+  <input class="search-bar" id="medSearch" placeholder="🔍 搜尋用藥紀錄..." oninput="renderMed()">
   <div id="medLogs"></div>
 </div>
 
@@ -357,8 +374,14 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 <div class="modal-bg" id="m-health" onclick="bgClose(event,'m-health')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">💉 新增健康紀錄</div>
   <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="hf-type" onchange="onHfTypeChange()"><option value="疫苗">疫苗接種</option><option value="回診">定期回診</option><option value="體重">體重量測</option><option value="症狀">症狀觀察</option></select></div>
-  <div class="f-group"><label class="f-label">名稱 / 說明</label><input class="f-input" id="hf-name" placeholder="e.g. 三合一疫苗 / 4.2kg"></div>
-  <div id="wt-hint" class="wt-hint" style="display:none">💡 體重請填在上方「名稱」欄位，如：4.2kg，會自動同步到首頁圖表</div>
+  <div class="f-group" id="hf-name-group"><label class="f-label">名稱 / 說明</label><input class="f-input" id="hf-name" placeholder="e.g. 三合一疫苗"></div>
+  <div class="f-group" id="hf-wt-group" style="display:none">
+    <label class="f-label">體重（kg）</label>
+    <div class="wt-input-row">
+      <input type="number" step="0.1" id="hf-wt" placeholder="4.2">
+      <span>kg</span>
+    </div>
+  </div>
   <div class="two-col">
     <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="hf-date-pick"></div></div>
     <div class="f-group"><label class="f-label">下次預定</label><div class="date-pick" id="hf-next-pick"></div></div>
@@ -490,6 +513,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 <script>
 
+
 var KEY="nekoDiary_v5";
 var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","其他":"🌿"};
 var VSTAT={done:{label:"已完成",color:"#7a9e87",bg:"#e8f0ea"},upcoming:{label:"即將到期",color:"#e07e6a",bg:"#fceee8"},due:{label:"建議預約",color:"#d97706",bg:"#fef3c7"}};
@@ -527,6 +551,64 @@ var editFoodIdx=-1;
 var editMedIdx=-1;
 var currentTab=0;
 
+
+
+function checkDailyReset(){
+  var lastDay=localStorage.getItem("lastDay");
+  var today=todayStr();
+  if(lastDay!==today){
+    suppList.forEach(function(s){s.doneToday=false;});
+    localStorage.setItem("lastDay",today);
+    saveDB();
+  }
+}
+function renderReminders(){
+  var el=document.getElementById("reminders");
+  if(!el)return;
+  while(el.firstChild)el.removeChild(el.firstChild);
+  var cards=[];
+
+  // 1. Vaccine due reminders
+  vaccines.forEach(function(v){
+    if(!v.next)return;
+    var diff=Math.round((new Date(v.next+"T12:00:00")-new Date())/(86400000));
+    if(diff<=30&&diff>=0){
+      cards.push({type:"warn",msg:"💉 "+v.name+" 還有 "+diff+" 天到期"});
+    } else if(diff<0){
+      cards.push({type:"warn",msg:"💉 "+v.name+" 已逾期 "+Math.abs(diff)+" 天！"});
+    }
+  });
+
+  // 2. No poop for 2+ days
+  var lastPoop=null;
+  poop.forEach(function(p){if(!lastPoop||p.date>lastPoop)lastPoop=p.date;});
+  if(lastPoop){
+    var daysSince=Math.round((new Date()-new Date(lastPoop+"T12:00:00"))/(86400000));
+    if(daysSince>=2) cards.push({type:"warn",msg:"🚽 已 "+daysSince+" 天未記錄排便，請注意！"});
+  }
+
+  // 3. Ongoing med reminders
+  var ongoingMeds=med.filter(function(m){return m.end&&m.end>=todayStr();});
+  if(ongoingMeds.length){
+    cards.push({type:"blue",msg:"💊 進行中療程："+ongoingMeds.map(function(m){return m.name;}).join("、")});
+  }
+
+  // 4. Monthly backup reminder
+  var lastExport=localStorage.getItem("lastExport");
+  if(lastExport){
+    var daysSinceExport=Math.round((new Date()-new Date(lastExport))/(86400000));
+    if(daysSinceExport>=30) cards.push({type:"info",msg:"📤 已超過 30 天未備份，建議匯出一次！"});
+  } else {
+    cards.push({type:"info",msg:"📤 記得定期匯出備份資料！"});
+  }
+
+  cards.forEach(function(card){
+    var d=document.createElement("div");
+    d.className="remind-card "+card.type;
+    d.textContent=card.msg;
+    el.appendChild(d);
+  });
+}
 function refreshDateDisplay(){
   var dn=new Date();
   document.getElementById("dateDisplay").textContent=(dn.getMonth()+1)+"月"+dn.getDate()+"日";
@@ -574,7 +656,9 @@ function openModal(type){
     document.getElementById("hf-type").value="疫苗";
     document.getElementById("hf-name").value="";
     document.getElementById("hf-note").value="";
-    document.getElementById("wt-hint").style.display="none";
+    document.getElementById("hf-wt").value="";
+    document.getElementById("hf-wt-group").style.display="none";
+    document.getElementById("hf-name-group").style.display="block";
     makeDatePick("hf-date-pick",todayStr());
     makeDatePick("hf-next-pick","");
     document.getElementById("m-health").classList.add("open");
@@ -810,9 +894,22 @@ function renderFoodPresetList(){
 function useFoodPreFromList(i){var p=fPre[i];closeModal("m-foodPreset");setTimeout(function(){openModal("food");useFoodPre(i);},200);}
 function delFoodPre(i){fPre.splice(i,1);saveDB();renderFoodPresetList();}
 
-function onHfTypeChange(){document.getElementById("wt-hint").style.display=document.getElementById("hf-type").value==="體重"?"block":"none";}
+function onHfTypeChange(){
+  var isWt=document.getElementById("hf-type").value==="體重";
+  document.getElementById("hf-wt-group").style.display=isWt?"block":"none";
+  document.getElementById("hf-name-group").style.display=isWt?"none":"block";
+  if(isWt){document.getElementById("hf-name").value="體重量測";}
+}
 function saveHealth(){
-  var l={type:document.getElementById("hf-type").value,name:document.getElementById("hf-name").value||document.getElementById("hf-type").value,date:getDP("hf-date-pick"),next:getDP("hf-next-pick"),note:document.getElementById("hf-note").value};
+  var type=document.getElementById("hf-type").value;
+  var name;
+  if(type==="體重"){
+    var wv=document.getElementById("hf-wt").value;
+    name=wv?wv+"kg":"體重量測";
+  } else {
+    name=document.getElementById("hf-name").value||type;
+  }
+  var l={type:type,name:name,date:getDP("hf-date-pick"),next:getDP("hf-next-pick"),note:document.getElementById("hf-note").value};
   health.unshift(l);
   if(l.type==="疫苗")vaccines.push({name:l.name,date:l.date,next:l.next||todayStr(365),status:"upcoming"});
   closeModal("m-health");saveDB();renderAll();
@@ -967,6 +1064,7 @@ function renderWtChart(){
 }
 
 function renderHome(){
+  renderReminders();
   var tf=0;for(var i=0;i<food.length;i++){if(food[i].date===todayStr())tf++;}
   var tp=0;for(var i=0;i<poop.length;i++){if(poop[i].date===todayStr())tp++;}
   document.getElementById("homeFoodCnt").innerHTML=tf+"<span class='stat-unit'>餐</span>";
@@ -995,8 +1093,11 @@ function renderHome(){
 
 function renderFood(){
   var el=clearEl("foodLogs");
-  if(!food.length){el.appendChild(emptyEl("🍽️","點右上角 + 新增"));return;}
-  appendDateGroup(el,food,function(l,idx){
+  var q=(document.getElementById("foodSearch")||{}).value||"";q=q.toLowerCase();
+  var arr=food.filter(function(l){return !q||(l.name||"").toLowerCase().indexOf(q)>=0||(l.type||"").toLowerCase().indexOf(q)>=0||(l.note||"").toLowerCase().indexOf(q)>=0;});
+  if(!arr.length){el.appendChild(emptyEl("🍽️",q?"沒有符合的紀錄":"點右上角 + 新增"));return;}
+  appendDateGroup(el,arr,function(l,idx){
+    var origIdx=food.indexOf(l);idx=origIdx>=0?origIdx:idx;
     var icon=l.type==="水"?"💧":l.type==="乾食"?"🥣":"🍽️";
     var detail=l.type+(l.amount?" · "+l.amount:"")+(l.note?" · "+l.note:"");
     return makeLcWrap(icon,"#faf3e0",l.name||l.type,detail,fmtD(l.date)+" "+l.time,"del('food',"+idx+")","openEditFood("+idx+")");
@@ -1017,9 +1118,12 @@ function renderHealth(){
     });
   }
   var hl=clearEl("healthLogs");
-  if(!health.length){hl.appendChild(emptyEl("🏥","點右上角 + 新增"));return;}
+  var q2=(document.getElementById("healthSearch")||{}).value||"";q2=q2.toLowerCase();
+  var harr=health.filter(function(l){return !q2||(l.name||"").toLowerCase().indexOf(q2)>=0||(l.type||"").toLowerCase().indexOf(q2)>=0;});
+  if(!harr.length){hl.appendChild(emptyEl("🏥",q2?"沒有符合的紀錄":"點右上角 + 新增"));return;}
   var HI={"疫苗":"💉","回診":"🏥","體重":"⚖️","症狀":"🩺"};
-  appendDateGroup(hl,health,function(l,idx){
+  appendDateGroup(hl,harr,function(l,idx){
+    var origIdx=health.indexOf(l);idx=origIdx>=0?origIdx:idx;
     return makeLcWrap(HI[l.type]||"📋","#fceee8",l.name||l.type,l.type+(l.note?" · "+l.note:""),fmtD(l.date),"del('health',"+idx+")",null);
   });
 }
@@ -1043,8 +1147,11 @@ function renderMed(){
     });
   }
   var ml=clearEl("medLogs");
-  if(!med.length){ml.appendChild(emptyEl("💊","點右上角 + 新增"));return;}
-  appendDateGroup(ml,med,function(l,idx){
+  var q3=(document.getElementById("medSearch")||{}).value||"";q3=q3.toLowerCase();
+  var marr=med.filter(function(l){return !q3||(l.name||"").toLowerCase().indexOf(q3)>=0;});
+  if(!marr.length){ml.appendChild(emptyEl("💊",q3?"沒有符合的紀錄":"點右上角 + 新增"));return;}
+  appendDateGroup(ml,marr,function(l,idx){
+    var origIdx=med.indexOf(l);idx=origIdx>=0?origIdx:idx;
     return makeLcWrap("💊","#eef0fa",l.name,l.method+" · "+l.dose+(l.note?" · "+l.note:""),fmtD(l.date)+" "+l.time,"del('med',"+idx+")","openEditMed("+idx+")");
   });
 }
@@ -1177,6 +1284,7 @@ function renderStats(){
 }
 
 function exportData(){
+  localStorage.setItem("lastExport",new Date().toISOString());
   var data=JSON.stringify({pet:pet,food:food,health:health,vaccines:vaccines,med:med,poop:poop,suppList:suppList,supp:supp,mPre:mPre,sPre:sPre,fPre:fPre,exportedAt:new Date().toISOString()},null,2);
   var blob=new Blob([data],{type:"application/json"});
   var url=URL.createObjectURL(blob);
@@ -1211,10 +1319,12 @@ function importData(){
   input.click();
 }
 function renderAll(){
+  checkDailyReset();
   renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
   if(currentTab===6)renderStats();
 }
 renderAll();
+
 
 </script>
 
