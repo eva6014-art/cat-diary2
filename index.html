@@ -172,7 +172,11 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
         <div class="pet-sub" id="petSub">橘貓 · 3 歲 · ♂ <span style="color:#a8c4b0">✏️</span></div>
       </div>
     </div>
-    <div class="date-badge" id="dateDisplay"></div>
+    <div style="display:flex;align-items:center;gap:7px">
+      <button onclick="exportData()" style="padding:5px 10px;border-radius:20px;border:1.5px solid #7a9e87;background:#e8f0ea;color:#7a9e87;font-size:11px;font-family:inherit;cursor:pointer;font-weight:500">📤 匯出</button>
+      <button onclick="importData()" style="padding:5px 10px;border-radius:20px;border:1.5px solid #7b8ec8;background:#eef0fa;color:#7b8ec8;font-size:11px;font-family:inherit;cursor:pointer;font-weight:500">📥 匯入</button>
+      <div class="date-badge" id="dateDisplay"></div>
+    </div>
   </div>
   <div class="tabs-wrap">
     <div class="tabs">
@@ -288,10 +292,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 <!-- STATS -->
 
 <div class="sec" id="sec-6">
-  <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-  <button onclick="exportData()" style="padding:8px 14px;border-radius:20px;border:1.5px solid #7a9e87;background:#e8f0ea;color:#7a9e87;font-size:12px;font-family:inherit;cursor:pointer;font-weight:500;margin-right:8px">📤 匯出</button><button onclick="importData()" style="padding:8px 14px;border-radius:20px;border:1.5px solid #7b8ec8;background:#eef0fa;color:#7b8ec8;font-size:12px;font-family:inherit;cursor:pointer;font-weight:500">📥 匯入</button>
-</div>
-<div class="period-row">
+  <div class="period-row">
     <button class="period-btn on" onclick="setPeriod(7,this)">本週</button>
     <button class="period-btn" onclick="setPeriod(14,this)">近2週</button>
     <button class="period-btn" onclick="setPeriod(30,this)">近30天</button>
@@ -998,7 +999,7 @@ function renderFood(){
   appendDateGroup(el,food,function(l,idx){
     var icon=l.type==="水"?"💧":l.type==="乾食"?"🥣":"🍽️";
     var detail=l.type+(l.amount?" · "+l.amount:"")+(l.note?" · "+l.note:"");
-    return makeLcWrap(icon,"#faf3e0",l.name||l.type,detail,l.time,"del('food',"+idx+")","openEditFood("+idx+")");
+    return makeLcWrap(icon,"#faf3e0",l.name||l.type,detail,fmtD(l.date)+" "+l.time,"del('food',"+idx+")","openEditFood("+idx+")");
   });
 }
 
@@ -1019,7 +1020,7 @@ function renderHealth(){
   if(!health.length){hl.appendChild(emptyEl("🏥","點右上角 + 新增"));return;}
   var HI={"疫苗":"💉","回診":"🏥","體重":"⚖️","症狀":"🩺"};
   appendDateGroup(hl,health,function(l,idx){
-    return makeLcWrap(HI[l.type]||"📋","#fceee8",l.name||l.type,l.type+(l.note?" · "+l.note:""),friendly(l.date),"del('health',"+idx+")",null);
+    return makeLcWrap(HI[l.type]||"📋","#fceee8",l.name||l.type,l.type+(l.note?" · "+l.note:""),fmtD(l.date),"del('health',"+idx+")",null);
   });
 }
 
@@ -1044,7 +1045,7 @@ function renderMed(){
   var ml=clearEl("medLogs");
   if(!med.length){ml.appendChild(emptyEl("💊","點右上角 + 新增"));return;}
   appendDateGroup(ml,med,function(l,idx){
-    return makeLcWrap("💊","#eef0fa",l.name,l.method+" · "+l.dose+(l.note?" · "+l.note:""),l.time,"del('med',"+idx+")","openEditMed("+idx+")");
+    return makeLcWrap("💊","#eef0fa",l.name,l.method+" · "+l.dose+(l.note?" · "+l.note:""),fmtD(l.date)+" "+l.time,"del('med',"+idx+")","openEditMed("+idx+")");
   });
 }
 
@@ -1071,7 +1072,7 @@ function renderPoop(){
       +"<span class='ptag'>"+l.color+"</span>"
       +(l.note?"<span class='ptag'>"+esc(l.note)+"</span>":"")
       +"</div></div>"
-      +"<div class='log-time'>"+l.time+"</div>";
+      +"<div class='log-time'>"+fmtD(l.date)+" "+l.time+"</div>";
     var acts=document.createElement("div");acts.className="lc-actions";
     var db=document.createElement("button");db.className="lc-del";db.textContent="🗑️";
     (function(i){db.onclick=function(e){e.stopPropagation();toggleLC(wrap);del("poop",i);};})(idx);
@@ -1094,7 +1095,7 @@ function renderSupp(){
   var sl=clearEl("suppLogs");
   if(!supp.length){sl.appendChild(emptyEl("🌿","點右上角 + 新增"));return;}
   appendDateGroup(sl,supp,function(l,idx){
-    return makeLcWrap(SICONS[l.type]||"🌿","#f5edf8",l.name,l.type+" · "+l.dose+(l.note?" · "+l.note:""),l.time,"del('supp',"+idx+")",null);
+    return makeLcWrap(SICONS[l.type]||"🌿","#f5edf8",l.name,l.type+" · "+l.dose+(l.note?" · "+l.note:""),fmtD(l.date)+" "+l.time,"del('supp',"+idx+")",null);
   });
 }
 
