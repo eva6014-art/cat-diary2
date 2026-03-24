@@ -514,29 +514,34 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
   </div>
   <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="em-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
   <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="em-note"></textarea></div>
-  <button class="pri-btn" style="background:
+  <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMed()">儲存修改</button>
+</div></div>
 
-var KEY=“nekoDiary_v5”;
-var SICONS={“腸胃保健”:“🦠”,“免疫力”:“🛡️”,“關節保健”:“🦴”,“皮毛保養”:“✨”,“泌尿保健”:“💧”,“眼睛保健”:“👁️”,“其他”:“🌿”};
-var VSTAT={done:{label:“已完成”,color:”#7a9e87”,bg:”#e8f0ea”},upcoming:{label:“即將到期”,color:”#e07e6a”,bg:”#fceee8”},due:{label:“建議預約”,color:”#d97706”,bg:”#fef3c7”}};
+<div class="toast" id="toast">💾 已自動儲存</div>
 
-function todayStr(n){n=n||0;var d=new Date();d.setDate(d.getDate()+n);return d.toISOString().split(“T”)[0];}
-function fmtD(s){if(!s)return””;var d=new Date(s+“T12:00:00”);return d.getFullYear()+”/”+(d.getMonth()+1)+”/”+d.getDate();}
-function friendly(s){if(!s)return””;if(s===todayStr())return”今天”;if(s===todayStr(-1))return”昨天”;return fmtD(s);}
+<script>
+
+var KEY="nekoDiary_v5";
+var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","其他":"🌿"};
+var VSTAT={done:{label:"已完成",color:"#7a9e87",bg:"#e8f0ea"},upcoming:{label:"即將到期",color:"#e07e6a",bg:"#fceee8"},due:{label:"建議預約",color:"#d97706",bg:"#fef3c7"}};
+
+function todayStr(n){n=n||0;var d=new Date();d.setDate(d.getDate()+n);return d.toISOString().split("T")[0];}
+function fmtD(s){if(!s)return"";var d=new Date(s+"T12:00:00");return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate();}
+function friendly(s){if(!s)return"";if(s===todayStr())return"今天";if(s===todayStr(-1))return"昨天";return fmtD(s);}
 function nowTime(){return new Date().toTimeString().slice(0,5);}
-function esc(s){return(s||””).replace(/&/g,”&”).replace(/</g,”<”).replace(/>/g,”>”);}
-function pad2(n){return n<10?“0”+n:””+n;}
+function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function pad2(n){return n<10?"0"+n:""+n;}
 
 function loadDB(){try{var r=localStorage.getItem(KEY);return r?JSON.parse(r):{}}catch(e){return{};}}
 function saveDB(){
-try{
-localStorage.setItem(KEY,JSON.stringify({pet:pet,food:food,health:health,vaccines:vaccines,med:med,poop:poop,suppList:suppList,supp:supp,mPre:mPre,sPre:sPre,fPre:fPre}));
-var t=document.getElementById(“toast”);t.classList.add(“show”);setTimeout(function(){t.classList.remove(“show”);},1800);
-}catch(e){}
+  try{
+    localStorage.setItem(KEY,JSON.stringify({pet:pet,food:food,health:health,vaccines:vaccines,med:med,poop:poop,suppList:suppList,supp:supp,mPre:mPre,sPre:sPre,fPre:fPre}));
+    var t=document.getElementById("toast");t.classList.add("show");setTimeout(function(){t.classList.remove("show");},1800);
+  }catch(e){}
 }
 
 var DB=loadDB();
-var pet=DB.pet||{name:“小橘”,breed:“橘貓”,age:“3 歲”,gender:“♂”};
+var pet=DB.pet||{name:"小橘",breed:"橘貓",age:"3 歲",gender:"♂"};
 var food=DB.food||[];
 var health=DB.health||[];
 var vaccines=DB.vaccines||[];
@@ -552,876 +557,872 @@ var confirmDelTarget=null;
 var editFoodIdx=-1;
 var editMedIdx=-1;
 var currentTab=0;
-var medCheckin=(function(){try{return JSON.parse(localStorage.getItem(“medCheckin”)||”{}”);}catch(e){return{};}}());
+var medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")||"{}");}catch(e){return{};}}());
+
+
 
 function checkDailyReset(){
-var lastDay=localStorage.getItem(“lastDay”);
-var today=todayStr();
-if(lastDay!==today){
-suppList.forEach(function(s){s.doneToday=false;});
-medCheckin={};
-localStorage.setItem(“lastDay”,today);
-localStorage.setItem(“medCheckin”,”{}”);
-saveDB();
-}
+  var lastDay=localStorage.getItem("lastDay");
+  var today=todayStr();
+  if(lastDay!==today){
+    suppList.forEach(function(s){s.doneToday=false;});
+    medCheckin={};
+    localStorage.setItem("lastDay",today);
+    localStorage.setItem("medCheckin","{}");
+    saveDB();
+  }
 }
 
 // ── Date range filter ─────────────────────────────────────────────────────
 var dateFilters={};
-function getDateFilter(key){return dateFilters[key]||“all”;}
+function getDateFilter(key){return dateFilters[key]||"all";}
 function filterByDate(l,filter){
-if(!filter||filter===“all”)return true;
-var d=l.date;
-var now=todayStr();
-if(filter===“7”)return d>=todayStr(-6);
-if(filter===“30”)return d>=todayStr(-29);
-if(filter===“90”)return d>=todayStr(-89);
-if(filter===“thisMonth”){
-var dn=new Date();
-var m=String(dn.getMonth()+1).padStart(2,“0”);
-return d.startsWith(dn.getFullYear()+”-”+m);
-}
-return true;
+  if(!filter||filter==="all")return true;
+  var d=l.date;
+  var now=todayStr();
+  if(filter==="7")return d>=todayStr(-6);
+  if(filter==="30")return d>=todayStr(-29);
+  if(filter==="90")return d>=todayStr(-89);
+  if(filter==="thisMonth"){
+    var dn=new Date();
+    var m=String(dn.getMonth()+1).padStart(2,"0");
+    return d.startsWith(dn.getFullYear()+"-"+m);
+  }
+  return true;
 }
 function renderDateRange(containerId,key){
-var el=document.getElementById(containerId);
-if(!el)return;
-while(el.firstChild)el.removeChild(el.firstChild);
-var wrap=document.createElement(“div”);wrap.className=“dr-wrap”;
-var lbl=document.createElement(“span”);lbl.className=“dr-label”;lbl.textContent=“篩選：”;
-wrap.appendChild(lbl);
-var opts=[[“all”,“全部”],[“7”,“近7天”],[“30”,“近30天”],[“90”,“近3個月”],[“thisMonth”,“本月”]];
-var cur=getDateFilter(key);
-opts.forEach(function(o){
-var btn=document.createElement(“button”);
-btn.className=“dr-select”+(o[0]===cur?” on”:””);
-btn.textContent=o[1];
-btn.onclick=(function(val,k){return function(){
-dateFilters[k]=val;
-if(k===“food”)renderFood();
-else if(k===“health”)renderHealth();
-else if(k===“med”)renderMed();
-else if(k===“poop”)renderPoop();
-else if(k===“supp”)renderSupp();
-};})(o[0],key);
-wrap.appendChild(btn);
-});
-el.appendChild(wrap);
+  var el=document.getElementById(containerId);
+  if(!el)return;
+  while(el.firstChild)el.removeChild(el.firstChild);
+  var wrap=document.createElement("div");wrap.className="dr-wrap";
+  var lbl=document.createElement("span");lbl.className="dr-label";lbl.textContent="篩選：";
+  wrap.appendChild(lbl);
+  var opts=[["all","全部"],["7","近7天"],["30","近30天"],["90","近3個月"],["thisMonth","本月"]];
+  var cur=getDateFilter(key);
+  opts.forEach(function(o){
+    var btn=document.createElement("button");
+    btn.className="dr-select"+(o[0]===cur?" on":"");
+    btn.textContent=o[1];
+    btn.onclick=(function(val,k){return function(){
+      dateFilters[k]=val;
+      if(k==="food")renderFood();
+      else if(k==="health")renderHealth();
+      else if(k==="med")renderMed();
+      else if(k==="poop")renderPoop();
+      else if(k==="supp")renderSupp();
+    };})(o[0],key);
+    wrap.appendChild(btn);
+  });
+  el.appendChild(wrap);
 }
 function renderReminders(){
-var el=document.getElementById(“reminders”);
-if(!el)return;
-while(el.firstChild)el.removeChild(el.firstChild);
-var cards=[];
+  var el=document.getElementById("reminders");
+  if(!el)return;
+  while(el.firstChild)el.removeChild(el.firstChild);
+  var cards=[];
 
-// 1. Vaccine due reminders
-vaccines.forEach(function(v){
-if(!v.next)return;
-var diff=Math.round((new Date(v.next+“T12:00:00”)-new Date())/(86400000));
-if(diff<=30&&diff>=0){
-cards.push({type:“warn”,msg:“💉 “+v.name+” 還有 “+diff+” 天到期”});
-} else if(diff<0){
-cards.push({type:“warn”,msg:“💉 “+v.name+” 已逾期 “+Math.abs(diff)+” 天！”});
-}
-});
+  // 1. Vaccine due reminders
+  vaccines.forEach(function(v){
+    if(!v.next)return;
+    var diff=Math.round((new Date(v.next+"T12:00:00")-new Date())/(86400000));
+    if(diff<=30&&diff>=0){
+      cards.push({type:"warn",msg:"💉 "+v.name+" 還有 "+diff+" 天到期"});
+    } else if(diff<0){
+      cards.push({type:"warn",msg:"💉 "+v.name+" 已逾期 "+Math.abs(diff)+" 天！"});
+    }
+  });
 
-// 2. No poop for 2+ days
-var lastPoop=null;
-poop.forEach(function(p){if(!lastPoop||p.date>lastPoop)lastPoop=p.date;});
-if(lastPoop){
-var daysSince=Math.round((new Date()-new Date(lastPoop+“T12:00:00”))/(86400000));
-if(daysSince>=2) cards.push({type:“warn”,msg:“🚽 已 “+daysSince+” 天未記錄排便，請注意！”});
-}
+  // 2. No poop for 2+ days
+  var lastPoop=null;
+  poop.forEach(function(p){if(!lastPoop||p.date>lastPoop)lastPoop=p.date;});
+  if(lastPoop){
+    var daysSince=Math.round((new Date()-new Date(lastPoop+"T12:00:00"))/(86400000));
+    if(daysSince>=2) cards.push({type:"warn",msg:"🚽 已 "+daysSince+" 天未記錄排便，請注意！"});
+  }
 
-// 3. Ongoing med reminders
-var ongoingMeds=med.filter(function(m){return m.end&&m.end>=todayStr();});
-if(ongoingMeds.length){
-cards.push({type:“blue”,msg:“💊 進行中療程：”+ongoingMeds.map(function(m){return m.name;}).join(”、”)});
-}
+  // 3. Ongoing med reminders
+  var ongoingMeds=med.filter(function(m){return m.end&&m.end>=todayStr();});
+  if(ongoingMeds.length){
+    cards.push({type:"blue",msg:"💊 進行中療程："+ongoingMeds.map(function(m){return m.name;}).join("、")});
+  }
 
-// 4. Monthly backup reminder
-var lastExport=localStorage.getItem(“lastExport”);
-if(lastExport){
-var daysSinceExport=Math.round((new Date()-new Date(lastExport))/(86400000));
-if(daysSinceExport>=30) cards.push({type:“info”,msg:“📤 已超過 30 天未備份，建議匯出一次！”});
-} else {
-cards.push({type:“info”,msg:“📤 記得定期匯出備份資料！”});
-}
+  // 4. Monthly backup reminder
+  var lastExport=localStorage.getItem("lastExport");
+  if(lastExport){
+    var daysSinceExport=Math.round((new Date()-new Date(lastExport))/(86400000));
+    if(daysSinceExport>=30) cards.push({type:"info",msg:"📤 已超過 30 天未備份，建議匯出一次！"});
+  } else {
+    cards.push({type:"info",msg:"📤 記得定期匯出備份資料！"});
+  }
 
-cards.forEach(function(card){
-var d=document.createElement(“div”);
-d.className=“remind-card “+card.type;
-d.textContent=card.msg;
-el.appendChild(d);
-});
+  cards.forEach(function(card){
+    var d=document.createElement("div");
+    d.className="remind-card "+card.type;
+    d.textContent=card.msg;
+    el.appendChild(d);
+  });
 }
 function refreshDateDisplay(){
-var dn=new Date();
-document.getElementById(“dateDisplay”).textContent=(dn.getMonth()+1)+“月”+dn.getDate()+“日”;
-setTimeout(refreshDateDisplay,60000);
+  var dn=new Date();
+  document.getElementById("dateDisplay").textContent=(dn.getMonth()+1)+"月"+dn.getDate()+"日";
+  setTimeout(refreshDateDisplay,60000);
 }
 refreshDateDisplay();
 updatePetHeader();
 
 function updatePetHeader(){
-document.getElementById(“petName”).textContent=pet.name;
-document.getElementById(“petSub”).innerHTML=esc(pet.breed)+” · “+esc(pet.age)+” · “+esc(pet.gender)+” <span style='color:#a8c4b0'>✏️</span>”;
-document.getElementById(“homeNote”).textContent=“今天是美好的一天，記得給”+pet.name+“量體重！”;
+  document.getElementById("petName").textContent=pet.name;
+  document.getElementById("petSub").innerHTML=esc(pet.breed)+" · "+esc(pet.age)+" · "+esc(pet.gender)+" <span style='color:#a8c4b0'>✏️</span>";
+  document.getElementById("homeNote").textContent="今天是美好的一天，記得給"+pet.name+"量體重！";
 }
 
 function goTab(i,btn){
-document.querySelectorAll(”.sec”).forEach(function(s){s.classList.remove(“on”);});
-document.getElementById(“sec-”+i).classList.add(“on”);
-document.querySelectorAll(”.tab”).forEach(function(t){t.classList.remove(“on”);});
-btn.classList.add(“on”);
-currentTab=i;
-if(i===6)renderStats();
+  document.querySelectorAll(".sec").forEach(function(s){s.classList.remove("on");});
+  document.getElementById("sec-"+i).classList.add("on");
+  document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("on");});
+  btn.classList.add("on");
+  currentTab=i;
+  if(i===6)renderStats();
 }
 function goNav(i,nb){
-document.querySelectorAll(”.nav-btn”).forEach(function(n){n.classList.remove(“on”);});
-nb.classList.add(“on”);
-document.querySelectorAll(”.tab”)[i].click();
+  document.querySelectorAll(".nav-btn").forEach(function(n){n.classList.remove("on");});
+  nb.classList.add("on");
+  document.querySelectorAll(".tab")[i].click();
 }
 
 function openModal(type){
-var t=nowTime();
-if(type===“food”){
-document.getElementById(“ff-time”).value=t;
-document.getElementById(“foodModalTitle”).textContent=“🍖 新增飲食紀錄”;
-document.getElementById(“ff-type”).value=“主食罐”;
-document.getElementById(“ff-name”).value=””;
-document.getElementById(“ff-amount”).value=””;
-document.getElementById(“ff-note”).value=””;
-editFoodIdx=-1;
-renderFoodQP();
-document.getElementById(“m-food”).classList.add(“open”);
-} else if(type===“foodPreset”){
-renderFoodPresetList();
-document.getElementById(“m-foodPreset”).classList.add(“open”);
-} else if(type===“health”){
-document.getElementById(“hf-type”).value=“疫苗”;
-document.getElementById(“hf-name”).value=””;
-document.getElementById(“hf-note”).value=””;
-document.getElementById(“hf-wt”).value=””;
-document.getElementById(“hf-wt-group”).style.display=“none”;
-document.getElementById(“hf-name-group”).style.display=“block”;
-makeDatePick(“hf-date-pick”,todayStr());
-makeDatePick(“hf-next-pick”,””);
-document.getElementById(“m-health”).classList.add(“open”);
-} else if(type===“med”){
-document.getElementById(“mf-name”).value=””;
-document.getElementById(“mf-dose”).value=””;
-document.getElementById(“mf-time”).value=t;
-document.getElementById(“mf-method”).value=“口服”;
-document.getElementById(“mf-note”).value=””;
-document.getElementById(“medModalTitle”).textContent=“💊 新增用藥紀錄”;
-editMedIdx=-1;
-makeDatePick(“mf-start-pick”,todayStr());
-makeDatePick(“mf-end-pick”,””);
-renderMedQP();
-document.getElementById(“m-med”).classList.add(“open”);
-} else if(type===“medPreset”){
-renderMedPresetList();
-document.getElementById(“m-medPreset”).classList.add(“open”);
-} else if(type===“poop”){
-document.getElementById(“pf-time”).value=t;
-document.getElementById(“pf-note”).value=””;
-document.querySelectorAll(”.poop-opt”).forEach(function(o){o.classList.remove(“on”);});
-document.querySelector(”[data-v=‘正常’]”).classList.add(“on”);
-document.querySelectorAll(”.color-dot”).forEach(function(o){o.classList.remove(“on”);});
-document.querySelector(”[data-v=‘棕色’]”).classList.add(“on”);
-document.getElementById(“m-poop”).classList.add(“open”);
-} else if(type===“supp”){
-document.getElementById(“sf-name”).value=””;
-document.getElementById(“sf-dose”).value=””;
-document.getElementById(“sf-time”).value=t;
-document.getElementById(“sf-brand”).value=””;
-document.getElementById(“sf-note”).value=””;
-renderSuppQP();
-document.getElementById(“m-supp”).classList.add(“open”);
-} else if(type===“suppPreset”){
-renderSuppPresetList();
-document.getElementById(“m-suppPreset”).classList.add(“open”);
-} else if(type===“pet”){
-document.getElementById(“pef-name”).value=pet.name;
-document.getElementById(“pef-breed”).value=pet.breed;
-document.getElementById(“pef-age”).value=pet.age;
-document.getElementById(“pef-gender”).value=pet.gender;
-document.getElementById(“m-pet”).classList.add(“open”);
+  var t=nowTime();
+  if(type==="food"){
+    document.getElementById("ff-time").value=t;
+    document.getElementById("foodModalTitle").textContent="🍖 新增飲食紀錄";
+    document.getElementById("ff-type").value="主食罐";
+    document.getElementById("ff-name").value="";
+    document.getElementById("ff-amount").value="";
+    document.getElementById("ff-note").value="";
+    editFoodIdx=-1;
+    renderFoodQP();
+    document.getElementById("m-food").classList.add("open");
+  } else if(type==="foodPreset"){
+    renderFoodPresetList();
+    document.getElementById("m-foodPreset").classList.add("open");
+  } else if(type==="health"){
+    document.getElementById("hf-type").value="疫苗";
+    document.getElementById("hf-name").value="";
+    document.getElementById("hf-note").value="";
+    document.getElementById("hf-wt").value="";
+    document.getElementById("hf-wt-group").style.display="none";
+    document.getElementById("hf-name-group").style.display="block";
+    makeDatePick("hf-date-pick",todayStr());
+    makeDatePick("hf-next-pick","");
+    document.getElementById("m-health").classList.add("open");
+  } else if(type==="med"){
+    document.getElementById("mf-name").value="";
+    document.getElementById("mf-dose").value="";
+    document.getElementById("mf-time").value=t;
+    document.getElementById("mf-method").value="口服";
+    document.getElementById("mf-note").value="";
+    document.getElementById("medModalTitle").textContent="💊 新增用藥紀錄";
+    editMedIdx=-1;
+    makeDatePick("mf-start-pick",todayStr());
+    makeDatePick("mf-end-pick","");
+    renderMedQP();
+    document.getElementById("m-med").classList.add("open");
+  } else if(type==="medPreset"){
+    renderMedPresetList();
+    document.getElementById("m-medPreset").classList.add("open");
+  } else if(type==="poop"){
+    document.getElementById("pf-time").value=t;
+    document.getElementById("pf-note").value="";
+    document.querySelectorAll(".poop-opt").forEach(function(o){o.classList.remove("on");});
+    document.querySelector("[data-v='正常']").classList.add("on");
+    document.querySelectorAll(".color-dot").forEach(function(o){o.classList.remove("on");});
+    document.querySelector("[data-v='棕色']").classList.add("on");
+    document.getElementById("m-poop").classList.add("open");
+  } else if(type==="supp"){
+    document.getElementById("sf-name").value="";
+    document.getElementById("sf-dose").value="";
+    document.getElementById("sf-time").value=t;
+    document.getElementById("sf-brand").value="";
+    document.getElementById("sf-note").value="";
+    renderSuppQP();
+    document.getElementById("m-supp").classList.add("open");
+  } else if(type==="suppPreset"){
+    renderSuppPresetList();
+    document.getElementById("m-suppPreset").classList.add("open");
+  } else if(type==="pet"){
+    document.getElementById("pef-name").value=pet.name;
+    document.getElementById("pef-breed").value=pet.breed;
+    document.getElementById("pef-age").value=pet.age;
+    document.getElementById("pef-gender").value=pet.gender;
+    document.getElementById("m-pet").classList.add("open");
+  }
 }
-}
-function closeModal(id){document.getElementById(id).classList.remove(“open”);}
+function closeModal(id){document.getElementById(id).classList.remove("open");}
 function bgClose(e,id){if(e.target.id===id)closeModal(id);}
 
 function makeDatePick(containerId,val){
-var el=document.getElementById(containerId);
-el.setAttribute(“data-val”,val||””);
-var parts=val?val.split(”-”):[String(new Date().getFullYear()),””,””];
-var yr=parseInt(parts[0])||new Date().getFullYear();
-var mo=parseInt(parts[1])||1;
-var dy=parseInt(parts[2])||1;
-var curYear=new Date().getFullYear();
-var yOpts=””;
-for(var y=curYear-2;y<=curYear+3;y++) yOpts+=”<option value=’”+y+”’”+(y===yr?” selected”:””)+”>”+y+” 年</option>”;
-var mOpts=””;
-for(var m=1;m<=12;m++) mOpts+=”<option value=’”+m+”’”+(m===mo?” selected”:””)+”>”+m+” 月</option>”;
-var days=new Date(yr,mo,0).getDate();
-var dOpts=””;
-for(var d=1;d<=days;d++) dOpts+=”<option value=’”+d+”’”+(d===dy?” selected”:””)+”>”+d+” 日</option>”;
-var cid=containerId;
-el.innerHTML=”<select class='f-select' style='padding:8px 6px;font-size:12px' data-role='y' onchange='dpChange(\""+cid+"\")'>”+yOpts+”</select>”
-+”<select class='f-select' style='padding:8px 6px;font-size:12px' data-role='m' onchange='dpChange(\""+cid+"\")'>”+mOpts+”</select>”
-+”<select class='f-select' style='padding:8px 6px;font-size:12px' data-role='d' onchange='dpChange(\""+cid+"\")'>”+dOpts+”</select>”;
+  var el=document.getElementById(containerId);
+  el.setAttribute("data-val",val||"");
+  var parts=val?val.split("-"):[String(new Date().getFullYear()),"",""];
+  var yr=parseInt(parts[0])||new Date().getFullYear();
+  var mo=parseInt(parts[1])||1;
+  var dy=parseInt(parts[2])||1;
+  var curYear=new Date().getFullYear();
+  var yOpts="";
+  for(var y=curYear-2;y<=curYear+3;y++) yOpts+="<option value='"+y+"'"+(y===yr?" selected":"")+">"+y+" 年</option>";
+  var mOpts="";
+  for(var m=1;m<=12;m++) mOpts+="<option value='"+m+"'"+(m===mo?" selected":"")+">"+m+" 月</option>";
+  var days=new Date(yr,mo,0).getDate();
+  var dOpts="";
+  for(var d=1;d<=days;d++) dOpts+="<option value='"+d+"'"+(d===dy?" selected":"")+">"+d+" 日</option>";
+  var cid=containerId;
+  el.innerHTML="<select class='f-select' style='padding:8px 6px;font-size:12px' data-role='y' onchange='dpChange(\""+cid+"\")'>"+yOpts+"</select>"
+    +"<select class='f-select' style='padding:8px 6px;font-size:12px' data-role='m' onchange='dpChange(\""+cid+"\")'>"+mOpts+"</select>"
+    +"<select class='f-select' style='padding:8px 6px;font-size:12px' data-role='d' onchange='dpChange(\""+cid+"\")'>"+dOpts+"</select>";
 }
 function dpChange(cid){
-var el=document.getElementById(cid);
-var sels=el.querySelectorAll(“select”);
-var y=sels[0].value,mo=parseInt(sels[1].value),d=parseInt(sels[2].value);
-if(sels[0]===document.activeElement||sels[1]===document.activeElement){
-var days=new Date(parseInt(y),mo,0).getDate();
-if(d>days)d=days;
-var dOpts=””;
-for(var i=1;i<=days;i++) dOpts+=”<option value=’”+i+”’”+(i===d?” selected”:””)+”>”+i+” 日</option>”;
-sels[2].innerHTML=dOpts;
+  var el=document.getElementById(cid);
+  var sels=el.querySelectorAll("select");
+  var y=sels[0].value,mo=parseInt(sels[1].value),d=parseInt(sels[2].value);
+  if(sels[0]===document.activeElement||sels[1]===document.activeElement){
+    var days=new Date(parseInt(y),mo,0).getDate();
+    if(d>days)d=days;
+    var dOpts="";
+    for(var i=1;i<=days;i++) dOpts+="<option value='"+i+"'"+(i===d?" selected":"")+">"+i+" 日</option>";
+    sels[2].innerHTML=dOpts;
+  }
+  el.setAttribute("data-val",y+"-"+pad2(mo)+"-"+pad2(d));
 }
-el.setAttribute(“data-val”,y+”-”+pad2(mo)+”-”+pad2(d));
-}
-function getDP(cid){return document.getElementById(cid).getAttribute(“data-val”)||””;}
+function getDP(cid){return document.getElementById(cid).getAttribute("data-val")||"";}
 
-function pickPoop(el){document.querySelectorAll(”.poop-opt”).forEach(function(o){o.classList.remove(“on”);});el.classList.add(“on”);}
-function pickColor(el){document.querySelectorAll(”.color-dot”).forEach(function(o){o.classList.remove(“on”);});el.classList.add(“on”);}
+function pickPoop(el){document.querySelectorAll(".poop-opt").forEach(function(o){o.classList.remove("on");});el.classList.add("on");}
+function pickColor(el){document.querySelectorAll(".color-dot").forEach(function(o){o.classList.remove("on");});el.classList.add("on");}
 
 function makeLcWrap(icon,bg,titleTxt,detailTxt,timeStr,delFn,editFn){
-var div=document.createElement(“div”);
-div.className=“lc-wrap”;
-div.setAttribute(“data-editfn”,editFn||””);
-div.onclick=function(){toggleLC(this);};
-var lc=document.createElement(“div”);
-lc.className=“lc”;
-var iconDiv=document.createElement(“div”);
-iconDiv.className=“log-icon”;
-iconDiv.style.background=bg;
-iconDiv.textContent=icon;
-var body=document.createElement(“div”);
-body.className=“log-body”;
-var t=document.createElement(“div”);
-t.className=“log-title”;
-t.textContent=titleTxt;
-var det=document.createElement(“div”);
-det.className=“log-detail”;
-det.textContent=detailTxt;
-body.appendChild(t);body.appendChild(det);
-var tm=document.createElement(“div”);
-tm.className=“log-time”;
-tm.textContent=timeStr;
-lc.appendChild(iconDiv);lc.appendChild(body);lc.appendChild(tm);
-var acts=document.createElement(“div”);
-acts.className=“lc-actions”;
-if(editFn){
-var eb=document.createElement(“button”);
-eb.className=“lc-edit”;
-eb.textContent=“✏️”;
-eb.onclick=function(e){e.stopPropagation();toggleLC(div);eval(editFn);};
-acts.appendChild(eb);
-}
-var db=document.createElement(“button”);
-db.className=“lc-del”;
-db.textContent=“🗑️”;
-db.onclick=function(e){e.stopPropagation();toggleLC(div);eval(delFn);};
-acts.appendChild(db);
-div.appendChild(lc);div.appendChild(acts);
-return div;
+  var div=document.createElement("div");
+  div.className="lc-wrap";
+  div.setAttribute("data-editfn",editFn||"");
+  div.onclick=function(){toggleLC(this);};
+  var lc=document.createElement("div");
+  lc.className="lc";
+  var iconDiv=document.createElement("div");
+  iconDiv.className="log-icon";
+  iconDiv.style.background=bg;
+  iconDiv.textContent=icon;
+  var body=document.createElement("div");
+  body.className="log-body";
+  var t=document.createElement("div");
+  t.className="log-title";
+  t.textContent=titleTxt;
+  var det=document.createElement("div");
+  det.className="log-detail";
+  det.textContent=detailTxt;
+  body.appendChild(t);body.appendChild(det);
+  var tm=document.createElement("div");
+  tm.className="log-time";
+  tm.textContent=timeStr;
+  lc.appendChild(iconDiv);lc.appendChild(body);lc.appendChild(tm);
+  var acts=document.createElement("div");
+  acts.className="lc-actions";
+  if(editFn){
+    var eb=document.createElement("button");
+    eb.className="lc-edit";
+    eb.textContent="✏️";
+    eb.onclick=function(e){e.stopPropagation();toggleLC(div);eval(editFn);};
+    acts.appendChild(eb);
+  }
+  var db=document.createElement("button");
+  db.className="lc-del";
+  db.textContent="🗑️";
+  db.onclick=function(e){e.stopPropagation();toggleLC(div);eval(delFn);};
+  acts.appendChild(db);
+  div.appendChild(lc);div.appendChild(acts);
+  return div;
 }
 function toggleLC(w){
-var was=w.classList.contains(“open”)||w.classList.contains(“open-s”);
-document.querySelectorAll(”.lc-wrap”).forEach(function(x){x.classList.remove(“open”,“open-s”);});
-if(!was){
-var hasEdit=!!w.getAttribute(“data-editfn”);
-w.classList.add(hasEdit?“open”:“open-s”);
-}
-}
-
-function appendDateGroup(container,arr,renderFn){
-var sorted=arr.map(function(item,i){return{item:item,idx:i};})
-.sort(function(a,b){return(b.item.date+(b.item.time||“00:00”)).localeCompare(a.item.date+(a.item.time||“00:00”));});
-var last=””;
-sorted.forEach(function(o){
-if(o.item.date!==last){
-var lbl=document.createElement(“div”);
-lbl.className=“date-lbl”;
-lbl.textContent=friendly(o.item.date);
-container.appendChild(lbl);
-last=o.item.date;
-}
-container.appendChild(renderFn(o.item,o.idx));
-});
-}
-function emptyEl(icon,txt){
-var div=document.createElement(“div”);
-div.className=“empty”;
-div.innerHTML=”<div class='empty-icon'>”+icon+”</div><div class='empty-txt'>”+txt+”</div>”;
-return div;
-}
-function clearEl(id){var el=document.getElementById(id);while(el.firstChild)el.removeChild(el.firstChild);return el;}
-
-function del(type,idx){confirmDelTarget={type:type,idx:idx};document.getElementById(“m-confirm”).classList.add(“open”);}
-function doDelete(){
-if(!confirmDelTarget)return;
-var t=confirmDelTarget.type,i=confirmDelTarget.idx;
-if(t===“food”)food=food.filter(function(*,j){return j!==i;});
-else if(t===“health”)health=health.filter(function(*,j){return j!==i;});
-else if(t===“med”)med=med.filter(function(*,j){return j!==i;});
-else if(t===“poop”)poop=poop.filter(function(*,j){return j!==i;});
-else if(t===“supp”)supp=supp.filter(function(_,j){return j!==i;});
-confirmDelTarget=null;
-closeModal(“m-confirm”);
-saveDB();renderAll();
-}
-
-function savePet(){
-pet.name=document.getElementById(“pef-name”).value||“小橘”;
-pet.breed=document.getElementById(“pef-breed”).value;
-pet.age=document.getElementById(“pef-age”).value;
-pet.gender=document.getElementById(“pef-gender”).value;
-closeModal(“m-pet”);saveDB();updatePetHeader();
-}
-
-function saveFood(){
-var amount=document.getElementById(“ff-amount”).value;
-var l={type:document.getElementById(“ff-type”).value,name:document.getElementById(“ff-name”).value||document.getElementById(“ff-type”).value,amount:amount?amount+“g”:””,time:document.getElementById(“ff-time”).value,note:document.getElementById(“ff-note”).value,date:todayStr()};
-if(editFoodIdx>=0){food[editFoodIdx]=l;}else{food.unshift(l);}
-editFoodIdx=-1;closeModal(“m-food”);saveDB();renderAll();
-}
-function openEditFood(idx){
-var l=food[idx];editFoodIdx=idx;
-document.getElementById(“ef-type”).value=l.type;
-document.getElementById(“ef-name”).value=l.name||””;
-document.getElementById(“ef-amount”).value=(l.amount||””).replace(“g”,””);
-document.getElementById(“ef-time”).value=l.time;
-document.getElementById(“ef-note”).value=l.note||””;
-document.getElementById(“m-edit-food”).classList.add(“open”);
-}
-function saveEditFood(){
-var amount=document.getElementById(“ef-amount”).value;
-food[editFoodIdx]={type:document.getElementById(“ef-type”).value,name:document.getElementById(“ef-name”).value,amount:amount?amount+“g”:””,time:document.getElementById(“ef-time”).value,note:document.getElementById(“ef-note”).value,date:food[editFoodIdx].date};
-editFoodIdx=-1;closeModal(“m-edit-food”);saveDB();renderAll();
-}
-function renderFoodQP(){
-var el=clearEl(“foodQP”);
-if(!fPre.length)return;
-var wrap=document.createElement(“div”);wrap.style.marginBottom=“12px”;
-var lbl=document.createElement(“div”);lbl.style.cssText=“font-size:10px;color:#b0aa9f;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px”;lbl.textContent=“常用快選”;
-var row=document.createElement(“div”);row.style.cssText=“display:flex;flex-wrap:wrap;gap:6px”;
-fPre.forEach(function(p,i){
-var chip=document.createElement(“div”);
-chip.style.cssText=“padding:5px 11px;border-radius:20px;border:1.5px solid #e4dfd8;font-size:11px;color:#7a766f;cursor:pointer;background:#f5f2ee”;
-chip.textContent=“🍽️ “+p.name;
-chip.onclick=function(){useFoodPre(i);};
-row.appendChild(chip);
-});
-wrap.appendChild(lbl);wrap.appendChild(row);el.appendChild(wrap);
-}
-function useFoodPre(i){var p=fPre[i];document.getElementById(“ff-type”).value=p.type;document.getElementById(“ff-name”).value=p.name;document.getElementById(“ff-amount”).value=p.amount||””;}
-function addFoodPre(){
-var n=document.getElementById(“fpf-name”).value.trim();if(!n)return;
-fPre.push({name:n,type:document.getElementById(“fpf-type”).value,amount:document.getElementById(“fpf-amount”).value});
-document.getElementById(“fpf-name”).value=””;document.getElementById(“fpf-amount”).value=””;
-saveDB();renderFoodPresetList();
-}
-function renderFoodPresetList(){
-var el=clearEl(“foodPresetList”);
-if(!fPre.length){el.appendChild(emptyEl(“🍽️”,“尚無常用食物”));return;}
-fPre.forEach(function(p,i){
-var card=document.createElement(“div”);card.className=“pre-card”;
-card.innerHTML=”<div class='pre-icon' style='background:#faf3e0'>🍽️</div><div style='flex:1;min-width:0'><div class='pre-name'>”+esc(p.name)+”</div><div class='pre-detail'>”+esc(p.type)+(p.amount?” · “+p.amount+“g”:””)+”</div></div>”;
-var acts=document.createElement(“div”);acts.style.cssText=“display:flex;gap:5px”;
-var ub=document.createElement(“button”);ub.className=“pre-use”;ub.style.cssText=“background:#faf3e0;color:#d4a853”;ub.textContent=“使用”;ub.onclick=function(){useFoodPreFromList(i);};
-var db=document.createElement(“button”);db.className=“pre-del”;db.textContent=“✕”;db.onclick=function(){delFoodPre(i);};
-acts.appendChild(ub);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
-});
-}
-function useFoodPreFromList(i){var p=fPre[i];closeModal(“m-foodPreset”);setTimeout(function(){openModal(“food”);useFoodPre(i);},200);}
-function delFoodPre(i){fPre.splice(i,1);saveDB();renderFoodPresetList();}
-
-function onHfTypeChange(){
-var isWt=document.getElementById(“hf-type”).value===“體重”;
-document.getElementById(“hf-wt-group”).style.display=isWt?“block”:“none”;
-document.getElementById(“hf-name-group”).style.display=isWt?“none”:“block”;
-if(isWt){document.getElementById(“hf-name”).value=“體重量測”;}
-}
-function saveHealth(){
-var type=document.getElementById(“hf-type”).value;
-var name;
-if(type===“體重”){
-var wv=document.getElementById(“hf-wt”).value;
-name=wv?wv+“kg”:“體重量測”;
-} else {
-name=document.getElementById(“hf-name”).value||type;
-}
-var l={type:type,name:name,date:getDP(“hf-date-pick”),next:getDP(“hf-next-pick”),note:document.getElementById(“hf-note”).value};
-health.unshift(l);
-if(l.type===“疫苗”)vaccines.push({name:l.name,date:l.date,next:l.next||todayStr(365),status:“upcoming”});
-closeModal(“m-health”);saveDB();renderAll();
-}
-
-function saveMed(){
-var l={name:document.getElementById(“mf-name”).value||“用藥”,dose:document.getElementById(“mf-dose”).value,time:document.getElementById(“mf-time”).value,method:document.getElementById(“mf-method”).value,start:getDP(“mf-start-pick”),end:getDP(“mf-end-pick”),note:document.getElementById(“mf-note”).value,date:todayStr()};
-if(editMedIdx>=0){med[editMedIdx]=l;}else{med.unshift(l);}
-editMedIdx=-1;closeModal(“m-med”);saveDB();renderAll();
-}
-function openEditMed(idx){
-var l=med[idx];editMedIdx=idx;
-document.getElementById(“em-name”).value=l.name;
-document.getElementById(“em-dose”).value=l.dose||””;
-document.getElementById(“em-time”).value=l.time;
-document.getElementById(“em-method”).value=l.method||“口服”;
-document.getElementById(“em-note”).value=l.note||””;
-document.getElementById(“m-edit-med”).classList.add(“open”);
-}
-function saveEditMed(){
-med[editMedIdx].name=document.getElementById(“em-name”).value;
-med[editMedIdx].dose=document.getElementById(“em-dose”).value;
-med[editMedIdx].time=document.getElementById(“em-time”).value;
-med[editMedIdx].method=document.getElementById(“em-method”).value;
-med[editMedIdx].note=document.getElementById(“em-note”).value;
-editMedIdx=-1;closeModal(“m-edit-med”);saveDB();renderAll();
-}
-function renderMedQP(){
-var el=clearEl(“medQP”);
-if(!mPre.length)return;
-var wrap=document.createElement(“div”);wrap.style.marginBottom=“12px”;
-var lbl=document.createElement(“div”);lbl.style.cssText=“font-size:10px;color:#b0aa9f;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px”;lbl.textContent=“常用快選”;
-var row=document.createElement(“div”);row.style.cssText=“display:flex;flex-wrap:wrap;gap:6px”;
-mPre.forEach(function(p,i){
-var chip=document.createElement(“div”);
-chip.style.cssText=“padding:5px 11px;border-radius:20px;border:1.5px solid #e4dfd8;font-size:11px;color:#7a766f;cursor:pointer;background:#f5f2ee”;
-chip.textContent=“💊 “+p.name;
-chip.onclick=function(){useMedPre(i);};
-row.appendChild(chip);
-});
-wrap.appendChild(lbl);wrap.appendChild(row);el.appendChild(wrap);
-}
-function useMedPre(i){var p=mPre[i];document.getElementById(“mf-name”).value=p.name;document.getElementById(“mf-dose”).value=p.dose;document.getElementById(“mf-method”).value=p.method;document.getElementById(“mf-note”).value=p.note||””;}
-function addMedPre(){
-var n=document.getElementById(“mpf-name”).value.trim();if(!n)return;
-mPre.push({name:n,dose:document.getElementById(“mpf-dose”).value,method:document.getElementById(“mpf-method”).value,note:document.getElementById(“mpf-note”).value});
-document.getElementById(“mpf-name”).value=””;
-saveDB();renderMedPresetList();
-}
-function renderMedPresetList(){
-var el=clearEl(“medPresetList”);
-if(!mPre.length){el.appendChild(emptyEl(“💊”,“尚無常用藥品”));return;}
-mPre.forEach(function(p,i){
-var card=document.createElement(“div”);card.className=“pre-card”;
-card.innerHTML=”<div class='pre-icon' style='background:#eef0fa'>💊</div><div style='flex:1;min-width:0'><div class='pre-name'>”+esc(p.name)+”</div><div class='pre-detail'>”+esc(p.dose)+” · “+esc(p.method)+(p.note?” · “+esc(p.note):””)+”</div></div>”;
-var acts=document.createElement(“div”);acts.style.cssText=“display:flex;gap:5px”;
-var ub=document.createElement(“button”);ub.className=“pre-use”;ub.style.cssText=“background:#eef0fa;color:#7b8ec8”;ub.textContent=“使用”;ub.onclick=function(){useMedPreFromList(i);};
-var db=document.createElement(“button”);db.className=“pre-del”;db.textContent=“✕”;db.onclick=function(){delMedPre(i);};
-acts.appendChild(ub);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
-});
-}
-function useMedPreFromList(i){closeModal(“m-medPreset”);setTimeout(function(){openModal(“med”);useMedPre(i);},200);}
-function delMedPre(i){mPre.splice(i,1);saveDB();renderMedPresetList();}
-
-function savePoop(){
-var shape=(document.querySelector(”.poop-opt.on”)||{dataset:{v:“正常”}}).dataset.v;
-var color=(document.querySelector(”.color-dot.on”)||{dataset:{v:“棕色”}}).dataset.v;
-poop.unshift({shape:shape,color:color,time:document.getElementById(“pf-time”).value,note:document.getElementById(“pf-note”).value,date:todayStr()});
-closeModal(“m-poop”);saveDB();renderAll();
-}
-
-function saveSupp(){
-var l={name:document.getElementById(“sf-name”).value||“保健品”,type:document.getElementById(“sf-type”).value,dose:document.getElementById(“sf-dose”).value,brand:document.getElementById(“sf-brand”).value,time:document.getElementById(“sf-time”).value,note:document.getElementById(“sf-note”).value,date:todayStr()};
-supp.unshift(l);
-var found=false;
-for(var i=0;i<suppList.length;i++){if(suppList[i].name===l.name){found=true;break;}}
-if(!found)suppList.push({name:l.name,type:l.type,dose:l.dose,doneToday:true});
-document.getElementById(“sf-name”).value=””;document.getElementById(“sf-dose”).value=””;document.getElementById(“sf-brand”).value=””;document.getElementById(“sf-note”).value=””;
-closeModal(“m-supp”);saveDB();renderAll();
-}
-function toggleSupp(i){
-suppList[i].doneToday=!suppList[i].doneToday;
-if(suppList[i].doneToday){var s=suppList[i];supp.unshift({name:s.name,type:s.type,dose:s.dose,time:nowTime(),note:””,date:todayStr()});}
-saveDB();renderAll();
-}
-function toggleMedCheckin(name){
-if(medCheckin[name]){
-delete medCheckin[name];
-} else {
-medCheckin[name]=nowTime();
-// also log to medLogs
-med.unshift({name:name,dose:””,time:nowTime(),method:“打卡”,start:””,end:””,note:“今日已給藥”,date:todayStr()});
-saveDB();renderMed();
-}
-localStorage.setItem(“medCheckin”,JSON.stringify(medCheckin));
-renderMedCheckin();
-}
-function renderMedCheckin(){
-var el=document.getElementById(“medCheckinGrid”);
-if(!el)return;
-while(el.firstChild)el.removeChild(el.firstChild);
-var ongoingMeds=med.filter(function(m){return m.end&&m.end>=todayStr();});
-// also include mPre items that are used recently
-var allMedNames={};
-ongoingMeds.forEach(function(m){allMedNames[m.name]=true;});
-var names=Object.keys(allMedNames);
-if(!names.length){
-var d=document.createElement(“div”);
-d.style.cssText=“color:#b0aa9f;font-size:12px;grid-column:1/-1;text-align:center;padding:12px”;
-d.textContent=“新增進行中療程後顯示打卡”;
-el.appendChild(d);return;
-}
-names.forEach(function(name){
-var done=!!medCheckin[name];
-var card=document.createElement(“div”);card.className=“supp-card”;
-card.innerHTML=”<div class='supp-icon' style='background:#eef0fa'>💊</div>”
-+”<div style='font-size:12px;font-weight:500;margin-bottom:3px'>”+esc(name)+”</div>”
-+”<div style='font-size:10px;color:#b0aa9f;margin-bottom:8px'>進行中療程</div>”;
-var chk=document.createElement(“div”);
-chk.className=“supp-check”+(done?” done”:””);
-chk.style.background=done?”#7b8ec8”:””;
-chk.textContent=done?“✓ 已給藥”:“＋ 打卡”;
-chk.onclick=(function(n){return function(){toggleMedCheckin(n);};})(name);
-card.appendChild(chk);el.appendChild(card);
-});
-}
-function renderSuppQP(){
-var el=clearEl(“suppQP”);
-if(!sPre.length)return;
-var wrap=document.createElement(“div”);wrap.style.marginBottom=“12px”;
-var lbl=document.createElement(“div”);lbl.style.cssText=“font-size:10px;color:#b0aa9f;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px”;lbl.textContent=“常用快選”;
-var row=document.createElement(“div”);row.style.cssText=“display:flex;flex-wrap:wrap;gap:6px”;
-sPre.forEach(function(p,i){
-var chip=document.createElement(“div”);
-chip.style.cssText=“padding:5px 11px;border-radius:20px;border:1.5px solid #e4dfd8;font-size:11px;color:#7a766f;cursor:pointer;background:#f5f2ee”;
-chip.textContent=(SICONS[p.type]||“🌿”)+” “+p.name;
-chip.onclick=function(){useSuppPre(i);};
-row.appendChild(chip);
-});
-wrap.appendChild(lbl);wrap.appendChild(row);el.appendChild(wrap);
-}
-function useSuppPre(i){var p=sPre[i];document.getElementById(“sf-name”).value=p.name;document.getElementById(“sf-type”).value=p.type;document.getElementById(“sf-dose”).value=p.dose;document.getElementById(“sf-brand”).value=p.brand||””;}
-function addSuppPre(){
-var n=document.getElementById(“spf-name”).value.trim();if(!n)return;
-sPre.push({name:n,dose:document.getElementById(“spf-dose”).value,type:document.getElementById(“spf-type”).value,brand:document.getElementById(“spf-brand”).value});
-document.getElementById(“spf-name”).value=””;
-saveDB();renderSuppPresetList();
-}
-function renderSuppPresetList(){
-var el=clearEl(“suppPresetList”);
-if(!sPre.length){el.appendChild(emptyEl(“🌿”,“尚無常用保健品”));return;}
-sPre.forEach(function(p,i){
-var card=document.createElement(“div”);card.className=“pre-card”;
-card.innerHTML=”<div class='pre-icon' style='background:#f5edf8'>”+(SICONS[p.type]||“🌿”)+”</div><div style='flex:1;min-width:0'><div class='pre-name'>”+esc(p.name)+”</div><div class='pre-detail'>”+esc(p.dose)+” · “+esc(p.type)+(p.brand?” · “+esc(p.brand):””)+”</div></div>”;
-var acts=document.createElement(“div”);acts.style.cssText=“display:flex;gap:5px”;
-var ub=document.createElement(“button”);ub.className=“pre-use”;ub.style.cssText=“background:#f5edf8;color:#b07ab8”;ub.textContent=“使用”;ub.onclick=function(){useSuppPreFromList(i);};
-var db=document.createElement(“button”);db.className=“pre-del”;db.textContent=“✕”;db.onclick=function(){delSuppPre(i);};
-acts.appendChild(ub);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
-});
-}
-function useSuppPreFromList(i){closeModal(“m-suppPreset”);setTimeout(function(){openModal(“supp”);useSuppPre(i);},200);}
-function delSuppPre(i){sPre.splice(i,1);saveDB();renderSuppPresetList();}
-
-function parseWt(l){var src=(l.name||””)+” “+(l.note||””);var m=src.match(/[0-9]+.?[0-9]*/);return m?parseFloat(m[0]):0;}
-function renderWtChart(){
-var el=clearEl(“wtChart”);
-var wtLogs=health.filter(function(l){return l.type===“體重”&&parseWt(l)>0;}).sort(function(a,b){return a.date.localeCompare(b.date);}).slice(-8);
-if(!wtLogs.length){
-var d=document.createElement(“div”);d.style.cssText=“font-size:11px;color:#b0aa9f;padding:8px 0;line-height:1.6”;d.innerHTML=“於健康頁面新增「體重量測」<br>名稱填入如：4.2kg，圖表會自動出現 📈”;el.appendChild(d);return;
-}
-var vals=wtLogs.map(parseWt);
-var latest=vals[vals.length-1];
-var minV=vals[0],maxV=vals[0];
-for(var i=0;i<vals.length;i++){if(vals[i]<minV)minV=vals[i];if(vals[i]>maxV)maxV=vals[i];}
-var lo=minV-0.3,hi=maxV+0.2,range=hi-lo||1;
-var W=300,H=80,PL=34,PR=8,PT=10,PB=20,cW=W-PL-PR,cH=H-PT-PB,n=wtLogs.length;
-var pts=[];
-for(var i=0;i<n;i++) pts.push({x:PL+(i/Math.max(n-1,1))*cW,y:PT+cH-(vals[i]-lo)/range*cH,v:vals[i],date:wtLogs[i].date});
-var lp=“M”+pts[0].x+” “+pts[0].y;
-for(var i=1;i<pts.length;i++){var cx=(pts[i-1].x+pts[i].x)/2;lp+=” C”+cx+”,”+pts[i-1].y+” “+cx+”,”+pts[i].y+” “+pts[i].x+” “+pts[i].y;}
-var ap=lp+” L”+pts[n-1].x+”,”+(PT+cH)+” L”+pts[0].x+”,”+(PT+cH)+” Z”;
-var ticks=[lo+0.15,(lo+hi)/2,hi-0.15];
-var ticksH=””;
-for(var i=0;i<ticks.length;i++){var ty=PT+cH-(ticks[i]-lo)/range*cH;ticksH+=”<line x1='"+PL+"' y1='"+ty+"' x2='"+(W-PR)+"' y2='"+ty+"' stroke='#e4dfd8' stroke-width='1'/><text x='"+(PL-4)+"' y='"+(ty+3.5)+"' text-anchor='end' font-size='8' fill='#b0aa9f'>”+ticks[i].toFixed(1)+”</text>”;}
-var dotsH=””;
-for(var i=0;i<pts.length;i++) dotsH+=”<circle cx='"+pts[i].x+"' cy='"+pts[i].y+"' r='4' fill='"+(i===n-1?"#7a9e87":"#fdfbf8")+"' stroke='#7a9e87' stroke-width='2'/><text x='"+pts[i].x+"' y='"+(H-4)+"' text-anchor='middle' font-size='7.5' fill='#b0aa9f'>”+fmtD(pts[i].date)+”</text>”;
-var lp2=pts[n-1];
-var hdr=document.createElement(“div”);hdr.style.cssText=“display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px”;hdr.innerHTML=”<div style='font-size:10px;color:#b0aa9f'>最近 “+n+” 次量測</div><div style='font-family:serif;font-size:18px;color:#7a9e87'>”+latest+” <span style='font-size:11px;color:#7a766f'>kg</span></div>”;
-el.appendChild(hdr);
-var svg=document.createElement(“div”);
-svg.innerHTML=”<svg width='100%' viewBox='0 0 "+W+" "+H+"' style='overflow:visible'><defs><linearGradient id='wg' x1='0' y1='0' x2='0' y2='1'><stop offset='0%' stop-color='#a8c4b0' stop-opacity='0.35'/><stop offset='100%' stop-color='#a8c4b0' stop-opacity='0.02'/></linearGradient></defs>”+ticksH+”<path d='"+ap+"' fill='url(#wg)'/><path d='"+lp+"' fill='none' stroke='#7a9e87' stroke-width='2' stroke-linecap='round'/>”+dotsH+”<text x='"+lp2.x+"' y='"+(lp2.y-8)+"' text-anchor='middle' font-size='9' fill='#7a9e87' font-weight='600'>”+latest+“kg</text></svg>”;
-el.appendChild(svg.firstChild);
-}
-
-function renderHome(){
-renderReminders();
-var tf=0;for(var i=0;i<food.length;i++){if(food[i].date===todayStr())tf++;}
-var tp=0;for(var i=0;i<poop.length;i++){if(poop[i].date===todayStr())tp++;}
-document.getElementById(“homeFoodCnt”).innerHTML=tf+”<span class='stat-unit'>餐</span>”;
-document.getElementById(“homePoopCnt”).innerHTML=tp+”<span class='stat-unit'>次</span>”;
-renderWtChart();
-var all=[];
-for(var i=0;i<food.length;i++){var l=food[i];all.push({icon:l.type===“水”?“💧”:l.type===“乾食”?“🥣”:“🍽️”,bg:”#faf3e0”,title:l.name||l.type,detail:l.type+(l.amount?” · “+l.amount:””),sort:l.date+(l.time||””)});}
-for(var i=0;i<med.length;i++){var l=med[i];all.push({icon:“💊”,bg:”#eef0fa”,title:l.name,detail:l.method+” · “+l.dose,sort:l.date+(l.time||””)});}
-for(var i=0;i<poop.length;i++){var l=poop[i];all.push({icon:“🚽”,bg:”#f5ede4”,title:“排便 · “+l.shape,detail:“顏色：”+l.color,sort:l.date+(l.time||””)});}
-for(var i=0;i<supp.length;i++){var l=supp[i];all.push({icon:SICONS[l.type]||“🌿”,bg:”#f5edf8”,title:l.name,detail:l.type+” · “+l.dose,sort:l.date+(l.time||””)});}
-all.sort(function(a,b){return b.sort.localeCompare(a.sort);});
-var el=clearEl(“recentLogs”);
-if(!all.length){el.appendChild(emptyEl(“📝”,“還沒有紀錄\n用快速按鈕新增！”));return;}
-for(var i=0;i<Math.min(6,all.length);i++){
-var r=all[i];
-var card=document.createElement(“div”);
-card.style.cssText=“background:#fdfbf8;border-radius:16px;padding:10px 12px;margin-bottom:7px;border:1px solid #e4dfd8;display:flex;align-items:center;gap:9px;box-shadow:0 2px 14px rgba(45,42,38,.07)”;
-card.innerHTML=”<div style='width:34px;height:34px;border-radius:9px;background:"+r.bg+";display:flex;align-items:center;justify-content:center;font-size:16px'>”+r.icon+”</div>”
-+”<div style='flex:1;min-width:0'>”
-+”<div style='font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>”+esc(r.title)+”</div>”
-+”<div style='font-size:11px;color:#7a766f;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>”+esc(r.detail)+”</div>”
-+”</div>”;
-el.appendChild(card);
-}
-}
-
-function renderFood(){
-var el=clearEl(“foodLogs”);
-renderDateRange(“dateRangeFood”,“food”);
-var df=getDateFilter(“food”);
-var arr=food.filter(function(l){return filterByDate(l,df);});
-if(!arr.length){el.appendChild(emptyEl(“🍽️”,“點右上角 + 新增”));return;}
-appendDateGroup(el,arr,function(l,idx){
-var origIdx=food.indexOf(l);idx=origIdx>=0?origIdx:idx;
-var icon=l.type===“水”?“💧”:l.type===“乾食”?“🥣”:“🍽️”;
-var detail=l.type+(l.amount?” · “+l.amount:””)+(l.note?” · “+l.note:””);
-return makeLcWrap(icon,”#faf3e0”,l.name||l.type,detail,fmtD(l.date)+” “+l.time,“del(‘food’,”+idx+”)”,“openEditFood(”+idx+”)”);
-});
-}
-
-function renderHealth(){
-var hl=clearEl(“healthLogs”);
-renderDateRange(“dateRangeHealth”,“health”);
-var df=getDateFilter(“health”);
-var HI={“疫苗”:“💉”,“回診”:“🏥”,“體重”:“⚖️”,“症狀”:“🩺”};
-var harr=health.filter(function(l){return filterByDate(l,df);});
-if(!harr.length){hl.appendChild(emptyEl(“🏥”,“點右上角 + 新增”));return;}
-appendDateGroup(hl,harr,function(l,idx){
-var origIdx=health.indexOf(l);idx=origIdx>=0?origIdx:idx;
-return makeLcWrap(HI[l.type]||“📋”,”#fceee8”,l.name||l.type,l.type+(l.note?” · “+l.note:””),fmtD(l.date)+(l.time?” “+l.time:””),“del(‘health’,”+idx+”)”,null);
-});
-}
-
-function renderMed(){
-renderMedCheckin();
-var ongoing=[];
-for(var i=0;i<med.length;i++){if(med[i].end&&med[i].end>=todayStr())ongoing.push(med[i]);}
-var el=clearEl(“medSchedules”);
-if(!ongoing.length){
-var d=document.createElement(“div”);d.style.cssText=“background:#e8f0ea;border-radius:10px;padding:10px 12px;font-size:12px;color:#7a9e87;margin-bottom:8px”;d.textContent=“✅ 目前無進行中療程”;el.appendChild(d);
-} else {
-ongoing.forEach(function(m){
-var s=new Date(m.start+“T12:00:00”),e=new Date(m.end+“T12:00:00”);
-var total=Math.max(1,Math.round((e-s)/86400000));
-var done=Math.min(total,Math.max(0,Math.round((new Date()-s)/86400000)));
-var card=document.createElement(“div”);card.className=“med-sched”;
-card.innerHTML=”<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:4px'><div style='font-size:13px;font-weight:500'>💊 “+esc(m.name)+”</div><span style='font-size:10px;color:#7b8ec8;background:#eef0fa;padding:2px 7px;border-radius:20px'>”+esc(m.method)+”</span></div>”
-+”<div style='font-size:11px;color:#7a766f'>”+esc(m.dose)+” · “+fmtD(m.start)+” — “+fmtD(m.end)+(m.note?” · “+esc(m.note):””)+”</div>”
-+”<div class='med-prog'><div class='med-prog-fill' style='width:"+Math.round(done/total*100)+"%'></div></div>”;
-el.appendChild(card);
-});
-}
-var ml=clearEl(“medLogs”);
-renderDateRange(“dateRangeMed”,“med”);
-var df3=getDateFilter(“med”);
-var marr=med.filter(function(l){return filterByDate(l,df3);});
-if(!marr.length){ml.appendChild(emptyEl(“💊”,“點右上角 + 新增”));return;}
-appendDateGroup(ml,marr,function(l,idx){
-var origIdx=med.indexOf(l);idx=origIdx>=0?origIdx:idx;
-return makeLcWrap(“💊”,”#eef0fa”,l.name,l.method+” · “+l.dose+(l.note?” · “+l.note:””),fmtD(l.date)+” “+l.time,“del(‘med’,”+idx+”)”,“openEditMed(”+idx+”)”);
-});
-}
-
-function renderPoop(){
-var tp=0;for(var i=0;i<poop.length;i++){if(poop[i].date===todayStr())tp++;}
-document.getElementById(“poopCnt”).innerHTML=tp+”<span class='stat-unit'>次</span>”;
-var sp=poop.slice().sort(function(a,b){return(b.date+b.time).localeCompare(a.date+a.time);});
-if(sp.length){document.getElementById(“poopLast”).textContent=friendly(sp[0].date)+” “+sp[0].time;document.getElementById(“poopLastShape”).textContent=sp[0].shape;}
-var ALERT=[“有血”,“拉稀”,“黏液”];
-var el=clearEl(“poopLogs”);
-renderDateRange(“dateRangePoop”,“poop”);
-var dfp=getDateFilter(“poop”);
-var filteredPoop=poop.filter(function(l){return filterByDate(l,dfp);});
-if(!filteredPoop.length){el.appendChild(emptyEl(“🚽”,“點右上角 + 新增”));return;}
-var sorted=filteredPoop.map(function(item,i){return{item:item,idx:poop.indexOf(item)};}).sort(function(a,b){return(b.item.date+(b.item.time||“00:00”)).localeCompare(a.item.date+(a.item.time||“00:00”));});
-var last=””;
-sorted.forEach(function(o){
-var l=o.item,idx=o.idx;
-if(l.date!==last){var lbl=document.createElement(“div”);lbl.className=“date-lbl”;lbl.textContent=friendly(l.date);el.appendChild(lbl);last=l.date;}
-var isA=ALERT.indexOf(l.shape)>=0;
-var wrap=document.createElement(“div”);wrap.className=“lc-wrap”;
-wrap.onclick=function(){toggleLC(this);};
-var lc=document.createElement(“div”);lc.className=“lc”;
-lc.innerHTML=”<div class='log-icon' style='background:#f5ede4'>🚽</div>”
-+”<div class='log-body'><div class='log-title'>排便紀錄</div>”
-+”<div class='ptags'><span class='ptag "+(isA?"alert":l.shape==="正常"?"good":"")+"'>”+l.shape+”</span>”
-+”<span class='ptag'>”+l.color+”</span>”
-+(l.note?”<span class='ptag'>”+esc(l.note)+”</span>”:””)
-+”</div></div>”
-+”<div class='log-time'>”+fmtD(l.date)+” “+l.time+”</div>”;
-var acts=document.createElement(“div”);acts.className=“lc-actions”;
-var db=document.createElement(“button”);db.className=“lc-del”;db.textContent=“🗑️”;
-(function(i){db.onclick=function(e){e.stopPropagation();toggleLC(wrap);del(“poop”,i);};})(idx);
-acts.appendChild(db);wrap.appendChild(lc);wrap.appendChild(acts);el.appendChild(wrap);
-});
-}
-
-function renderSupp(){
-var el=clearEl(“suppGrid”);
-if(!suppList.length){var d=document.createElement(“div”);d.style.cssText=“color:#b0aa9f;font-size:12px;grid-column:1/-1;text-align:center;padding:16px”;d.textContent=“新增保健品後顯示打卡”;el.appendChild(d);}
-else{
-suppList.forEach(function(s,i){
-var card=document.createElement(“div”);card.className=“supp-card”;
-card.innerHTML=”<div class='supp-icon'>”+(SICONS[s.type]||“🌿”)+”</div><div style='font-size:12px;font-weight:500;margin-bottom:3px'>”+esc(s.name)+”</div><div style='font-size:10px;color:#b0aa9f;margin-bottom:8px'>”+esc(s.dose)+”</div>”;
-var chk=document.createElement(“div”);chk.className=“supp-check”+(s.doneToday?” done”:””);chk.textContent=s.doneToday?“✓ 已給予”:“＋ 打卡”;
-(function(i){chk.onclick=function(){toggleSupp(i);};})(i);
-card.appendChild(chk);el.appendChild(card);
-});
-}
-var sl=clearEl(“suppLogs”);
-renderDateRange(“dateRangeSupp”,“supp”);
-var dfs=getDateFilter(“supp”);
-var sarr=supp.filter(function(l){return filterByDate(l,dfs);});
-if(!sarr.length){sl.appendChild(emptyEl(“🌿”,“點右上角 + 新增”));return;}
-appendDateGroup(sl,sarr,function(l,idx){
-var origIdx=supp.indexOf(l);idx=origIdx>=0?origIdx:idx;
-return makeLcWrap(SICONS[l.type]||“🌿”,”#f5edf8”,l.name,l.type+” · “+l.dose+(l.note?” · “+l.note:””),fmtD(l.date)+” “+l.time,“del(‘supp’,”+idx+”)”,null);
-});
-}
-
-function setPeriod(d,btn){statsPeriod=d;document.querySelectorAll(”.period-btn”).forEach(function(b){b.classList.remove(“on”);});btn.classList.add(“on”);renderStats();}
-function topItems(arr,key){
-var m={};
-for(var i=0;i<arr.length;i++) m[arr[i][key]]=(m[arr[i][key]]||0)+1;
-var r=[];for(var k in m){if(Object.prototype.hasOwnProperty.call(m,k))r.push({name:k,count:m[k]});}
-return r.sort(function(a,b){return b.count-a.count;});
-}
-function renderStats(){
-var dates=[],d;
-for(var i=statsPeriod-1;i>=0;i–) dates.push(todayStr(-i));
-var start=dates[0];
-var fL=[],pL=[],mL=[],sL=[];
-for(var i=0;i<food.length;i++){if(food[i].date>=start)fL.push(food[i]);}
-for(var i=0;i<poop.length;i++){if(poop[i].date>=start)pL.push(poop[i]);}
-for(var i=0;i<med.length;i++){if(med[i].date>=start)mL.push(med[i]);}
-for(var i=0;i<supp.length;i++){if(supp[i].date>=start)sL.push(supp[i]);}
-
-function barCounts(arr){return dates.map(function(d){var c=0;for(var i=0;i<arr.length;i++){if(arr[i].date===d)c++;}return c;});}
-function dayLbl(i){var dobj=new Date(dates[i]+“T12:00:00”);if(statsPeriod<=7)return[“日”,“一”,“二”,“三”,“四”,“五”,“六”][dobj.getDay()];return i%2===0?fmtD(dates[i]):””;}
-
-var el=clearEl(“statsContent”);
-
-function makeBlock(title,arr,color,paleBg,keyField,label1,label3,alertFn){
-var counts=barCounts(arr);
-var maxC=1;for(var i=0;i<counts.length;i++){if(counts[i]>maxC)maxC=counts[i];}
-var avg=(arr.length/statsPeriod).toFixed(1);
-var top=topItems(arr,keyField);
-var alertCnt=alertFn?alertFn(arr):0;
-var val3=alertFn?alertCnt:top.length;
-var isWarn=alertFn?alertCnt>0:false;
-
-```
-var card=document.createElement("div");card.className="card";card.style.marginBottom="12px";
-
-var titleEl=document.createElement("div");titleEl.style.cssText="font-family:serif;font-size:13px;font-weight:500;margin-bottom:12px";titleEl.textContent=title;
-card.appendChild(titleEl);
-
-var kpi=document.createElement("div");kpi.className="kpi-row";
-kpi.innerHTML="<div><div class='kpi-val'>"+arr.length+"</div><div class='kpi-lbl'>"+label1+"</div></div>"
-  +"<div><div class='kpi-val'>"+avg+"</div><div class='kpi-lbl'>日均</div></div>"
-  +"<div><div class='kpi-val' style='color:"+(alertFn&&alertCnt>0?"#e07e6a":"#2d2a26")+"'>"+val3+"</div><div class='kpi-lbl'>"+label3+"</div></div>";
-card.appendChild(kpi);
-
-var barWrap=document.createElement("div");barWrap.className="bar-wrap";
-for(var i=0;i<counts.length;i++){
-  var pct=Math.round(counts[i]/maxC*100);
-  var hi=counts[i]===maxC&&counts[i]>0;
-  var col=document.createElement("div");col.className="bar-col";
-  var fill=document.createElement("div");fill.className="bar-fill";
-  fill.style.cssText="height:"+Math.max(pct,counts[i]>0?5:2)+"%;background:"+(hi?color:paleBg);
-  var lbl=document.createElement("div");lbl.className="bar-lbl";lbl.textContent=dayLbl(i);
-  col.appendChild(fill);col.appendChild(lbl);barWrap.appendChild(col);
-}
-card.appendChild(barWrap);
-
-if(top.length){
-  var topLbl=document.createElement("div");topLbl.style.cssText="font-size:10px;color:#b0aa9f;margin:10px 0 6px";topLbl.textContent="Top 3";card.appendChild(topLbl);
-  for(var i=0;i<Math.min(3,top.length);i++){
-    var row=document.createElement("div");row.className="top-row";
-    row.innerHTML="<div class='top-name'>"+esc(top[i].name)+"</div><div class='top-bar-bg'><div class='top-bar-fill' style='width:"+Math.round(top[i].count/top[0].count*100)+"%;background:"+color+"'></div></div><div class='top-count'>"+top[i].count+"</div>";
-    card.appendChild(row);
+  var was=w.classList.contains("open")||w.classList.contains("open-s");
+  document.querySelectorAll(".lc-wrap").forEach(function(x){x.classList.remove("open","open-s");});
+  if(!was){
+    var hasEdit=!!w.getAttribute("data-editfn");
+    w.classList.add(hasEdit?"open":"open-s");
   }
 }
 
-var ins=document.createElement("div");ins.className="insight";
-ins.style.cssText="background:"+(isWarn?"#fceee8":"#e8f0ea")+";color:"+(isWarn?"#e07e6a":"#7a9e87");
-if(alertFn) ins.textContent=alertCnt>0?"⚠️ 有 "+alertCnt+" 次異常排便，建議諮詢獸醫":arr.length===0?"📋 本期尚無排便紀錄":"✅ 排便狀況正常！";
-else ins.textContent=arr.length===0?"📋 本期尚無紀錄":"✅ 本期共 "+arr.length+" 筆，持續記錄中！";
-card.appendChild(ins);
-return card;
-```
+function appendDateGroup(container,arr,renderFn){
+  var sorted=arr.map(function(item,i){return{item:item,idx:i};})
+    .sort(function(a,b){return(b.item.date+(b.item.time||"00:00")).localeCompare(a.item.date+(a.item.time||"00:00"));});
+  var last="";
+  sorted.forEach(function(o){
+    if(o.item.date!==last){
+      var lbl=document.createElement("div");
+      lbl.className="date-lbl";
+      lbl.textContent=friendly(o.item.date);
+      container.appendChild(lbl);
+      last=o.item.date;
+    }
+    container.appendChild(renderFn(o.item,o.idx));
+  });
+}
+function emptyEl(icon,txt){
+  var div=document.createElement("div");
+  div.className="empty";
+  div.innerHTML="<div class='empty-icon'>"+icon+"</div><div class='empty-txt'>"+txt+"</div>";
+  return div;
+}
+function clearEl(id){var el=document.getElementById(id);while(el.firstChild)el.removeChild(el.firstChild);return el;}
 
+function del(type,idx){confirmDelTarget={type:type,idx:idx};document.getElementById("m-confirm").classList.add("open");}
+function doDelete(){
+  if(!confirmDelTarget)return;
+  var t=confirmDelTarget.type,i=confirmDelTarget.idx;
+  if(t==="food")food=food.filter(function(_,j){return j!==i;});
+  else if(t==="health")health=health.filter(function(_,j){return j!==i;});
+  else if(t==="med")med=med.filter(function(_,j){return j!==i;});
+  else if(t==="poop")poop=poop.filter(function(_,j){return j!==i;});
+  else if(t==="supp")supp=supp.filter(function(_,j){return j!==i;});
+  confirmDelTarget=null;
+  closeModal("m-confirm");
+  saveDB();renderAll();
 }
 
-el.appendChild(makeBlock(“🍖 飲食統計”,fL,”#d4a853”,”#faf3e0”,“type”,“總餐數”,“種類”,null));
-el.appendChild(makeBlock(“🚽 排便統計”,pL,”#a07850”,”#f5ede4”,“shape”,“總次數”,“異常次數”,function(a){var c=0;for(var i=0;i<a.length;i++){if([“有血”,“拉稀”,“黏液”].indexOf(a[i].shape)>=0)c++;}return c;}));
-el.appendChild(makeBlock(“💊 用藥統計”,mL,”#7b8ec8”,”#eef0fa”,“name”,“給藥次數”,“種類”,null));
-el.appendChild(makeBlock(“🌿 保健統計”,sL,”#b07ab8”,”#f5edf8”,“name”,“給予次數”,“種類”,null));
+function savePet(){
+  pet.name=document.getElementById("pef-name").value||"小橘";
+  pet.breed=document.getElementById("pef-breed").value;
+  pet.age=document.getElementById("pef-age").value;
+  pet.gender=document.getElementById("pef-gender").value;
+  closeModal("m-pet");saveDB();updatePetHeader();
+}
+
+function saveFood(){
+  var amount=document.getElementById("ff-amount").value;
+  var l={type:document.getElementById("ff-type").value,name:document.getElementById("ff-name").value||document.getElementById("ff-type").value,amount:amount?amount+"g":"",time:document.getElementById("ff-time").value,note:document.getElementById("ff-note").value,date:todayStr()};
+  if(editFoodIdx>=0){food[editFoodIdx]=l;}else{food.unshift(l);}
+  editFoodIdx=-1;closeModal("m-food");saveDB();renderAll();
+}
+function openEditFood(idx){
+  var l=food[idx];editFoodIdx=idx;
+  document.getElementById("ef-type").value=l.type;
+  document.getElementById("ef-name").value=l.name||"";
+  document.getElementById("ef-amount").value=(l.amount||"").replace("g","");
+  document.getElementById("ef-time").value=l.time;
+  document.getElementById("ef-note").value=l.note||"";
+  document.getElementById("m-edit-food").classList.add("open");
+}
+function saveEditFood(){
+  var amount=document.getElementById("ef-amount").value;
+  food[editFoodIdx]={type:document.getElementById("ef-type").value,name:document.getElementById("ef-name").value,amount:amount?amount+"g":"",time:document.getElementById("ef-time").value,note:document.getElementById("ef-note").value,date:food[editFoodIdx].date};
+  editFoodIdx=-1;closeModal("m-edit-food");saveDB();renderAll();
+}
+function renderFoodQP(){
+  var el=clearEl("foodQP");
+  if(!fPre.length)return;
+  var wrap=document.createElement("div");wrap.style.marginBottom="12px";
+  var lbl=document.createElement("div");lbl.style.cssText="font-size:10px;color:#b0aa9f;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px";lbl.textContent="常用快選";
+  var row=document.createElement("div");row.style.cssText="display:flex;flex-wrap:wrap;gap:6px";
+  fPre.forEach(function(p,i){
+    var chip=document.createElement("div");
+    chip.style.cssText="padding:5px 11px;border-radius:20px;border:1.5px solid #e4dfd8;font-size:11px;color:#7a766f;cursor:pointer;background:#f5f2ee";
+    chip.textContent="🍽️ "+p.name;
+    chip.onclick=function(){useFoodPre(i);};
+    row.appendChild(chip);
+  });
+  wrap.appendChild(lbl);wrap.appendChild(row);el.appendChild(wrap);
+}
+function useFoodPre(i){var p=fPre[i];document.getElementById("ff-type").value=p.type;document.getElementById("ff-name").value=p.name;document.getElementById("ff-amount").value=p.amount||"";}
+function addFoodPre(){
+  var n=document.getElementById("fpf-name").value.trim();if(!n)return;
+  fPre.push({name:n,type:document.getElementById("fpf-type").value,amount:document.getElementById("fpf-amount").value});
+  document.getElementById("fpf-name").value="";document.getElementById("fpf-amount").value="";
+  saveDB();renderFoodPresetList();
+}
+function renderFoodPresetList(){
+  var el=clearEl("foodPresetList");
+  if(!fPre.length){el.appendChild(emptyEl("🍽️","尚無常用食物"));return;}
+  fPre.forEach(function(p,i){
+    var card=document.createElement("div");card.className="pre-card";
+    card.innerHTML="<div class='pre-icon' style='background:#faf3e0'>🍽️</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.type)+(p.amount?" · "+p.amount+"g":"")+"</div></div>";
+    var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
+    var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#faf3e0;color:#d4a853";ub.textContent="使用";ub.onclick=function(){useFoodPreFromList(i);};
+    var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.onclick=function(){delFoodPre(i);};
+    acts.appendChild(ub);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
+  });
+}
+function useFoodPreFromList(i){var p=fPre[i];closeModal("m-foodPreset");setTimeout(function(){openModal("food");useFoodPre(i);},200);}
+function delFoodPre(i){fPre.splice(i,1);saveDB();renderFoodPresetList();}
+
+function onHfTypeChange(){
+  var isWt=document.getElementById("hf-type").value==="體重";
+  document.getElementById("hf-wt-group").style.display=isWt?"block":"none";
+  document.getElementById("hf-name-group").style.display=isWt?"none":"block";
+  if(isWt){document.getElementById("hf-name").value="體重量測";}
+}
+function saveHealth(){
+  var type=document.getElementById("hf-type").value;
+  var name;
+  if(type==="體重"){
+    var wv=document.getElementById("hf-wt").value;
+    name=wv?wv+"kg":"體重量測";
+  } else {
+    name=document.getElementById("hf-name").value||type;
+  }
+  var l={type:type,name:name,date:getDP("hf-date-pick"),next:getDP("hf-next-pick"),note:document.getElementById("hf-note").value};
+  health.unshift(l);
+  if(l.type==="疫苗")vaccines.push({name:l.name,date:l.date,next:l.next||todayStr(365),status:"upcoming"});
+  closeModal("m-health");saveDB();renderAll();
+}
+
+function saveMed(){
+  var l={name:document.getElementById("mf-name").value||"用藥",dose:document.getElementById("mf-dose").value,time:document.getElementById("mf-time").value,method:document.getElementById("mf-method").value,start:getDP("mf-start-pick"),end:getDP("mf-end-pick"),note:document.getElementById("mf-note").value,date:todayStr()};
+  if(editMedIdx>=0){med[editMedIdx]=l;}else{med.unshift(l);}
+  editMedIdx=-1;closeModal("m-med");saveDB();renderAll();
+}
+function openEditMed(idx){
+  var l=med[idx];editMedIdx=idx;
+  document.getElementById("em-name").value=l.name;
+  document.getElementById("em-dose").value=l.dose||"";
+  document.getElementById("em-time").value=l.time;
+  document.getElementById("em-method").value=l.method||"口服";
+  document.getElementById("em-note").value=l.note||"";
+  document.getElementById("m-edit-med").classList.add("open");
+}
+function saveEditMed(){
+  med[editMedIdx].name=document.getElementById("em-name").value;
+  med[editMedIdx].dose=document.getElementById("em-dose").value;
+  med[editMedIdx].time=document.getElementById("em-time").value;
+  med[editMedIdx].method=document.getElementById("em-method").value;
+  med[editMedIdx].note=document.getElementById("em-note").value;
+  editMedIdx=-1;closeModal("m-edit-med");saveDB();renderAll();
+}
+function renderMedQP(){
+  var el=clearEl("medQP");
+  if(!mPre.length)return;
+  var wrap=document.createElement("div");wrap.style.marginBottom="12px";
+  var lbl=document.createElement("div");lbl.style.cssText="font-size:10px;color:#b0aa9f;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px";lbl.textContent="常用快選";
+  var row=document.createElement("div");row.style.cssText="display:flex;flex-wrap:wrap;gap:6px";
+  mPre.forEach(function(p,i){
+    var chip=document.createElement("div");
+    chip.style.cssText="padding:5px 11px;border-radius:20px;border:1.5px solid #e4dfd8;font-size:11px;color:#7a766f;cursor:pointer;background:#f5f2ee";
+    chip.textContent="💊 "+p.name;
+    chip.onclick=function(){useMedPre(i);};
+    row.appendChild(chip);
+  });
+  wrap.appendChild(lbl);wrap.appendChild(row);el.appendChild(wrap);
+}
+function useMedPre(i){var p=mPre[i];document.getElementById("mf-name").value=p.name;document.getElementById("mf-dose").value=p.dose;document.getElementById("mf-method").value=p.method;document.getElementById("mf-note").value=p.note||"";}
+function addMedPre(){
+  var n=document.getElementById("mpf-name").value.trim();if(!n)return;
+  mPre.push({name:n,dose:document.getElementById("mpf-dose").value,method:document.getElementById("mpf-method").value,note:document.getElementById("mpf-note").value});
+  document.getElementById("mpf-name").value="";
+  saveDB();renderMedPresetList();
+}
+function renderMedPresetList(){
+  var el=clearEl("medPresetList");
+  if(!mPre.length){el.appendChild(emptyEl("💊","尚無常用藥品"));return;}
+  mPre.forEach(function(p,i){
+    var card=document.createElement("div");card.className="pre-card";
+    card.innerHTML="<div class='pre-icon' style='background:#eef0fa'>💊</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.dose)+" · "+esc(p.method)+(p.note?" · "+esc(p.note):"")+"</div></div>";
+    var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
+    var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#eef0fa;color:#7b8ec8";ub.textContent="使用";ub.onclick=function(){useMedPreFromList(i);};
+    var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.onclick=function(){delMedPre(i);};
+    acts.appendChild(ub);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
+  });
+}
+function useMedPreFromList(i){closeModal("m-medPreset");setTimeout(function(){openModal("med");useMedPre(i);},200);}
+function delMedPre(i){mPre.splice(i,1);saveDB();renderMedPresetList();}
+
+function savePoop(){
+  var shape=(document.querySelector(".poop-opt.on")||{dataset:{v:"正常"}}).dataset.v;
+  var color=(document.querySelector(".color-dot.on")||{dataset:{v:"棕色"}}).dataset.v;
+  poop.unshift({shape:shape,color:color,time:document.getElementById("pf-time").value,note:document.getElementById("pf-note").value,date:todayStr()});
+  closeModal("m-poop");saveDB();renderAll();
+}
+
+function saveSupp(){
+  var l={name:document.getElementById("sf-name").value||"保健品",type:document.getElementById("sf-type").value,dose:document.getElementById("sf-dose").value,brand:document.getElementById("sf-brand").value,time:document.getElementById("sf-time").value,note:document.getElementById("sf-note").value,date:todayStr()};
+  supp.unshift(l);
+  var found=false;
+  for(var i=0;i<suppList.length;i++){if(suppList[i].name===l.name){found=true;break;}}
+  if(!found)suppList.push({name:l.name,type:l.type,dose:l.dose,doneToday:true});
+  document.getElementById("sf-name").value="";document.getElementById("sf-dose").value="";document.getElementById("sf-brand").value="";document.getElementById("sf-note").value="";
+  closeModal("m-supp");saveDB();renderAll();
+}
+function toggleSupp(i){
+  suppList[i].doneToday=!suppList[i].doneToday;
+  if(suppList[i].doneToday){var s=suppList[i];supp.unshift({name:s.name,type:s.type,dose:s.dose,time:nowTime(),note:"",date:todayStr()});}
+  saveDB();renderAll();
+}
+function toggleMedCheckin(name){
+  if(medCheckin[name]){
+    delete medCheckin[name];
+  } else {
+    medCheckin[name]=nowTime();
+    // also log to medLogs
+    med.unshift({name:name,dose:"",time:nowTime(),method:"打卡",start:"",end:"",note:"今日已給藥",date:todayStr()});
+    saveDB();renderMed();
+  }
+  localStorage.setItem("medCheckin",JSON.stringify(medCheckin));
+  renderMedCheckin();
+}
+function renderMedCheckin(){
+  var el=document.getElementById("medCheckinGrid");
+  if(!el)return;
+  while(el.firstChild)el.removeChild(el.firstChild);
+  var ongoingMeds=med.filter(function(m){return m.end&&m.end>=todayStr();});
+  // also include mPre items that are used recently
+  var allMedNames={};
+  ongoingMeds.forEach(function(m){allMedNames[m.name]=true;});
+  var names=Object.keys(allMedNames);
+  if(!names.length){
+    var d=document.createElement("div");
+    d.style.cssText="color:#b0aa9f;font-size:12px;grid-column:1/-1;text-align:center;padding:12px";
+    d.textContent="新增進行中療程後顯示打卡";
+    el.appendChild(d);return;
+  }
+  names.forEach(function(name){
+    var done=!!medCheckin[name];
+    var card=document.createElement("div");card.className="supp-card";
+    card.innerHTML="<div class='supp-icon' style='background:#eef0fa'>💊</div>"
+      +"<div style='font-size:12px;font-weight:500;margin-bottom:3px'>"+esc(name)+"</div>"
+      +"<div style='font-size:10px;color:#b0aa9f;margin-bottom:8px'>進行中療程</div>";
+    var chk=document.createElement("div");
+    chk.className="supp-check"+(done?" done":"");
+    chk.style.background=done?"#7b8ec8":"";
+    chk.textContent=done?"✓ 已給藥":"＋ 打卡";
+    chk.onclick=(function(n){return function(){toggleMedCheckin(n);};})(name);
+    card.appendChild(chk);el.appendChild(card);
+  });
+}
+function renderSuppQP(){
+  var el=clearEl("suppQP");
+  if(!sPre.length)return;
+  var wrap=document.createElement("div");wrap.style.marginBottom="12px";
+  var lbl=document.createElement("div");lbl.style.cssText="font-size:10px;color:#b0aa9f;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px";lbl.textContent="常用快選";
+  var row=document.createElement("div");row.style.cssText="display:flex;flex-wrap:wrap;gap:6px";
+  sPre.forEach(function(p,i){
+    var chip=document.createElement("div");
+    chip.style.cssText="padding:5px 11px;border-radius:20px;border:1.5px solid #e4dfd8;font-size:11px;color:#7a766f;cursor:pointer;background:#f5f2ee";
+    chip.textContent=(SICONS[p.type]||"🌿")+" "+p.name;
+    chip.onclick=function(){useSuppPre(i);};
+    row.appendChild(chip);
+  });
+  wrap.appendChild(lbl);wrap.appendChild(row);el.appendChild(wrap);
+}
+function useSuppPre(i){var p=sPre[i];document.getElementById("sf-name").value=p.name;document.getElementById("sf-type").value=p.type;document.getElementById("sf-dose").value=p.dose;document.getElementById("sf-brand").value=p.brand||"";}
+function addSuppPre(){
+  var n=document.getElementById("spf-name").value.trim();if(!n)return;
+  sPre.push({name:n,dose:document.getElementById("spf-dose").value,type:document.getElementById("spf-type").value,brand:document.getElementById("spf-brand").value});
+  document.getElementById("spf-name").value="";
+  saveDB();renderSuppPresetList();
+}
+function renderSuppPresetList(){
+  var el=clearEl("suppPresetList");
+  if(!sPre.length){el.appendChild(emptyEl("🌿","尚無常用保健品"));return;}
+  sPre.forEach(function(p,i){
+    var card=document.createElement("div");card.className="pre-card";
+    card.innerHTML="<div class='pre-icon' style='background:#f5edf8'>"+(SICONS[p.type]||"🌿")+"</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.dose)+" · "+esc(p.type)+(p.brand?" · "+esc(p.brand):"")+"</div></div>";
+    var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
+    var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#f5edf8;color:#b07ab8";ub.textContent="使用";ub.onclick=function(){useSuppPreFromList(i);};
+    var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.onclick=function(){delSuppPre(i);};
+    acts.appendChild(ub);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
+  });
+}
+function useSuppPreFromList(i){closeModal("m-suppPreset");setTimeout(function(){openModal("supp");useSuppPre(i);},200);}
+function delSuppPre(i){sPre.splice(i,1);saveDB();renderSuppPresetList();}
+
+function parseWt(l){var src=(l.name||"")+" "+(l.note||"");var m=src.match(/[0-9]+\.?[0-9]*/);return m?parseFloat(m[0]):0;}
+function renderWtChart(){
+  var el=clearEl("wtChart");
+  var wtLogs=health.filter(function(l){return l.type==="體重"&&parseWt(l)>0;}).sort(function(a,b){return a.date.localeCompare(b.date);}).slice(-8);
+  if(!wtLogs.length){
+    var d=document.createElement("div");d.style.cssText="font-size:11px;color:#b0aa9f;padding:8px 0;line-height:1.6";d.innerHTML="於健康頁面新增「體重量測」<br>名稱填入如：4.2kg，圖表會自動出現 📈";el.appendChild(d);return;
+  }
+  var vals=wtLogs.map(parseWt);
+  var latest=vals[vals.length-1];
+  var minV=vals[0],maxV=vals[0];
+  for(var i=0;i<vals.length;i++){if(vals[i]<minV)minV=vals[i];if(vals[i]>maxV)maxV=vals[i];}
+  var lo=minV-0.3,hi=maxV+0.2,range=hi-lo||1;
+  var W=300,H=80,PL=34,PR=8,PT=10,PB=20,cW=W-PL-PR,cH=H-PT-PB,n=wtLogs.length;
+  var pts=[];
+  for(var i=0;i<n;i++) pts.push({x:PL+(i/Math.max(n-1,1))*cW,y:PT+cH-(vals[i]-lo)/range*cH,v:vals[i],date:wtLogs[i].date});
+  var lp="M"+pts[0].x+" "+pts[0].y;
+  for(var i=1;i<pts.length;i++){var cx=(pts[i-1].x+pts[i].x)/2;lp+=" C"+cx+","+pts[i-1].y+" "+cx+","+pts[i].y+" "+pts[i].x+" "+pts[i].y;}
+  var ap=lp+" L"+pts[n-1].x+","+(PT+cH)+" L"+pts[0].x+","+(PT+cH)+" Z";
+  var ticks=[lo+0.15,(lo+hi)/2,hi-0.15];
+  var ticksH="";
+  for(var i=0;i<ticks.length;i++){var ty=PT+cH-(ticks[i]-lo)/range*cH;ticksH+="<line x1='"+PL+"' y1='"+ty+"' x2='"+(W-PR)+"' y2='"+ty+"' stroke='#e4dfd8' stroke-width='1'/><text x='"+(PL-4)+"' y='"+(ty+3.5)+"' text-anchor='end' font-size='8' fill='#b0aa9f'>"+ticks[i].toFixed(1)+"</text>";}
+  var dotsH="";
+  for(var i=0;i<pts.length;i++) dotsH+="<circle cx='"+pts[i].x+"' cy='"+pts[i].y+"' r='4' fill='"+(i===n-1?"#7a9e87":"#fdfbf8")+"' stroke='#7a9e87' stroke-width='2'/><text x='"+pts[i].x+"' y='"+(H-4)+"' text-anchor='middle' font-size='7.5' fill='#b0aa9f'>"+fmtD(pts[i].date)+"</text>";
+  var lp2=pts[n-1];
+  var hdr=document.createElement("div");hdr.style.cssText="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px";hdr.innerHTML="<div style='font-size:10px;color:#b0aa9f'>最近 "+n+" 次量測</div><div style='font-family:serif;font-size:18px;color:#7a9e87'>"+latest+" <span style='font-size:11px;color:#7a766f'>kg</span></div>";
+  el.appendChild(hdr);
+  var svg=document.createElement("div");
+  svg.innerHTML="<svg width='100%' viewBox='0 0 "+W+" "+H+"' style='overflow:visible'><defs><linearGradient id='wg' x1='0' y1='0' x2='0' y2='1'><stop offset='0%' stop-color='#a8c4b0' stop-opacity='0.35'/><stop offset='100%' stop-color='#a8c4b0' stop-opacity='0.02'/></linearGradient></defs>"+ticksH+"<path d='"+ap+"' fill='url(#wg)'/><path d='"+lp+"' fill='none' stroke='#7a9e87' stroke-width='2' stroke-linecap='round'/>"+dotsH+"<text x='"+lp2.x+"' y='"+(lp2.y-8)+"' text-anchor='middle' font-size='9' fill='#7a9e87' font-weight='600'>"+latest+"kg</text></svg>";
+  el.appendChild(svg.firstChild);
+}
+
+function renderHome(){
+  renderReminders();
+  var tf=0;for(var i=0;i<food.length;i++){if(food[i].date===todayStr())tf++;}
+  var tp=0;for(var i=0;i<poop.length;i++){if(poop[i].date===todayStr())tp++;}
+  document.getElementById("homeFoodCnt").innerHTML=tf+"<span class='stat-unit'>餐</span>";
+  document.getElementById("homePoopCnt").innerHTML=tp+"<span class='stat-unit'>次</span>";
+  renderWtChart();
+  var all=[];
+  for(var i=0;i<food.length;i++){var l=food[i];all.push({icon:l.type==="水"?"💧":l.type==="乾食"?"🥣":"🍽️",bg:"#faf3e0",title:l.name||l.type,detail:l.type+(l.amount?" · "+l.amount:""),sort:l.date+(l.time||"")});}
+  for(var i=0;i<med.length;i++){var l=med[i];all.push({icon:"💊",bg:"#eef0fa",title:l.name,detail:l.method+" · "+l.dose,sort:l.date+(l.time||"")});}
+  for(var i=0;i<poop.length;i++){var l=poop[i];all.push({icon:"🚽",bg:"#f5ede4",title:"排便 · "+l.shape,detail:"顏色："+l.color,sort:l.date+(l.time||"")});}
+  for(var i=0;i<supp.length;i++){var l=supp[i];all.push({icon:SICONS[l.type]||"🌿",bg:"#f5edf8",title:l.name,detail:l.type+" · "+l.dose,sort:l.date+(l.time||"")});}
+  all.sort(function(a,b){return b.sort.localeCompare(a.sort);});
+  var el=clearEl("recentLogs");
+  if(!all.length){el.appendChild(emptyEl("📝","還沒有紀錄\n用快速按鈕新增！"));return;}
+  for(var i=0;i<Math.min(6,all.length);i++){
+    var r=all[i];
+    var card=document.createElement("div");
+    card.style.cssText="background:#fdfbf8;border-radius:16px;padding:10px 12px;margin-bottom:7px;border:1px solid #e4dfd8;display:flex;align-items:center;gap:9px;box-shadow:0 2px 14px rgba(45,42,38,.07)";
+    card.innerHTML="<div style='width:34px;height:34px;border-radius:9px;background:"+r.bg+";display:flex;align-items:center;justify-content:center;font-size:16px'>"+r.icon+"</div>"
+      +"<div style='flex:1;min-width:0'>"
+      +"<div style='font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+esc(r.title)+"</div>"
+      +"<div style='font-size:11px;color:#7a766f;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+esc(r.detail)+"</div>"
+      +"</div>";
+    el.appendChild(card);
+  }
+}
+
+function renderFood(){
+  var el=clearEl("foodLogs");
+  renderDateRange("dateRangeFood","food");
+  var df=getDateFilter("food");
+  var arr=food.filter(function(l){return filterByDate(l,df);});
+  if(!arr.length){el.appendChild(emptyEl("🍽️","點右上角 + 新增"));return;}
+  appendDateGroup(el,arr,function(l,idx){
+    var origIdx=food.indexOf(l);idx=origIdx>=0?origIdx:idx;
+    var icon=l.type==="水"?"💧":l.type==="乾食"?"🥣":"🍽️";
+    var detail=l.type+(l.amount?" · "+l.amount:"")+(l.note?" · "+l.note:"");
+    return makeLcWrap(icon,"#faf3e0",l.name||l.type,detail,fmtD(l.date)+" "+l.time,"del('food',"+idx+")","openEditFood("+idx+")");
+  });
+}
+
+function renderHealth(){
+  var hl=clearEl("healthLogs");
+  renderDateRange("dateRangeHealth","health");
+  var df=getDateFilter("health");
+  var HI={"疫苗":"💉","回診":"🏥","體重":"⚖️","症狀":"🩺"};
+  var harr=health.filter(function(l){return filterByDate(l,df);});
+  if(!harr.length){hl.appendChild(emptyEl("🏥","點右上角 + 新增"));return;}
+  appendDateGroup(hl,harr,function(l,idx){
+    var origIdx=health.indexOf(l);idx=origIdx>=0?origIdx:idx;
+    return makeLcWrap(HI[l.type]||"📋","#fceee8",l.name||l.type,l.type+(l.note?" · "+l.note:""),fmtD(l.date)+(l.time?" "+l.time:""),"del('health',"+idx+")",null);
+  });
+}
+
+function renderMed(){
+  renderMedCheckin();
+  var ongoing=[];
+  for(var i=0;i<med.length;i++){if(med[i].end&&med[i].end>=todayStr())ongoing.push(med[i]);}
+  var el=clearEl("medSchedules");
+  if(!ongoing.length){
+    var d=document.createElement("div");d.style.cssText="background:#e8f0ea;border-radius:10px;padding:10px 12px;font-size:12px;color:#7a9e87;margin-bottom:8px";d.textContent="✅ 目前無進行中療程";el.appendChild(d);
+  } else {
+    ongoing.forEach(function(m){
+      var s=new Date(m.start+"T12:00:00"),e=new Date(m.end+"T12:00:00");
+      var total=Math.max(1,Math.round((e-s)/86400000));
+      var done=Math.min(total,Math.max(0,Math.round((new Date()-s)/86400000)));
+      var card=document.createElement("div");card.className="med-sched";
+      card.innerHTML="<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:4px'><div style='font-size:13px;font-weight:500'>💊 "+esc(m.name)+"</div><span style='font-size:10px;color:#7b8ec8;background:#eef0fa;padding:2px 7px;border-radius:20px'>"+esc(m.method)+"</span></div>"
+        +"<div style='font-size:11px;color:#7a766f'>"+esc(m.dose)+" · "+fmtD(m.start)+" — "+fmtD(m.end)+(m.note?" · "+esc(m.note):"")+"</div>"
+        +"<div class='med-prog'><div class='med-prog-fill' style='width:"+Math.round(done/total*100)+"%'></div></div>";
+      el.appendChild(card);
+    });
+  }
+  var ml=clearEl("medLogs");
+  renderDateRange("dateRangeMed","med");
+  var df3=getDateFilter("med");
+  var marr=med.filter(function(l){return filterByDate(l,df3);});
+  if(!marr.length){ml.appendChild(emptyEl("💊","點右上角 + 新增"));return;}
+  appendDateGroup(ml,marr,function(l,idx){
+    var origIdx=med.indexOf(l);idx=origIdx>=0?origIdx:idx;
+    return makeLcWrap("💊","#eef0fa",l.name,l.method+" · "+l.dose+(l.note?" · "+l.note:""),fmtD(l.date)+" "+l.time,"del('med',"+idx+")","openEditMed("+idx+")");
+  });
+}
+
+function renderPoop(){
+  var tp=0;for(var i=0;i<poop.length;i++){if(poop[i].date===todayStr())tp++;}
+  document.getElementById("poopCnt").innerHTML=tp+"<span class='stat-unit'>次</span>";
+  var sp=poop.slice().sort(function(a,b){return(b.date+b.time).localeCompare(a.date+a.time);});
+  if(sp.length){document.getElementById("poopLast").textContent=friendly(sp[0].date)+" "+sp[0].time;document.getElementById("poopLastShape").textContent=sp[0].shape;}
+  var ALERT=["有血","拉稀","黏液"];
+  var el=clearEl("poopLogs");
+  renderDateRange("dateRangePoop","poop");
+  var dfp=getDateFilter("poop");
+  var filteredPoop=poop.filter(function(l){return filterByDate(l,dfp);});
+  if(!filteredPoop.length){el.appendChild(emptyEl("🚽","點右上角 + 新增"));return;}
+  var sorted=filteredPoop.map(function(item,i){return{item:item,idx:poop.indexOf(item)};}).sort(function(a,b){return(b.item.date+(b.item.time||"00:00")).localeCompare(a.item.date+(a.item.time||"00:00"));});
+  var last="";
+  sorted.forEach(function(o){
+    var l=o.item,idx=o.idx;
+    if(l.date!==last){var lbl=document.createElement("div");lbl.className="date-lbl";lbl.textContent=friendly(l.date);el.appendChild(lbl);last=l.date;}
+    var isA=ALERT.indexOf(l.shape)>=0;
+    var wrap=document.createElement("div");wrap.className="lc-wrap";
+    wrap.onclick=function(){toggleLC(this);};
+    var lc=document.createElement("div");lc.className="lc";
+    lc.innerHTML="<div class='log-icon' style='background:#f5ede4'>🚽</div>"
+      +"<div class='log-body'><div class='log-title'>排便紀錄</div>"
+      +"<div class='ptags'><span class='ptag "+(isA?"alert":l.shape==="正常"?"good":"")+"'>"+l.shape+"</span>"
+      +"<span class='ptag'>"+l.color+"</span>"
+      +(l.note?"<span class='ptag'>"+esc(l.note)+"</span>":"")
+      +"</div></div>"
+      +"<div class='log-time'>"+fmtD(l.date)+" "+l.time+"</div>";
+    var acts=document.createElement("div");acts.className="lc-actions";
+    var db=document.createElement("button");db.className="lc-del";db.textContent="🗑️";
+    (function(i){db.onclick=function(e){e.stopPropagation();toggleLC(wrap);del("poop",i);};})(idx);
+    acts.appendChild(db);wrap.appendChild(lc);wrap.appendChild(acts);el.appendChild(wrap);
+  });
+}
+
+function renderSupp(){
+  var el=clearEl("suppGrid");
+  if(!suppList.length){var d=document.createElement("div");d.style.cssText="color:#b0aa9f;font-size:12px;grid-column:1/-1;text-align:center;padding:16px";d.textContent="新增保健品後顯示打卡";el.appendChild(d);}
+  else{
+    suppList.forEach(function(s,i){
+      var card=document.createElement("div");card.className="supp-card";
+      card.innerHTML="<div class='supp-icon'>"+(SICONS[s.type]||"🌿")+"</div><div style='font-size:12px;font-weight:500;margin-bottom:3px'>"+esc(s.name)+"</div><div style='font-size:10px;color:#b0aa9f;margin-bottom:8px'>"+esc(s.dose)+"</div>";
+      var chk=document.createElement("div");chk.className="supp-check"+(s.doneToday?" done":"");chk.textContent=s.doneToday?"✓ 已給予":"＋ 打卡";
+      (function(i){chk.onclick=function(){toggleSupp(i);};})(i);
+      card.appendChild(chk);el.appendChild(card);
+    });
+  }
+  var sl=clearEl("suppLogs");
+  renderDateRange("dateRangeSupp","supp");
+  var dfs=getDateFilter("supp");
+  var sarr=supp.filter(function(l){return filterByDate(l,dfs);});
+  if(!sarr.length){sl.appendChild(emptyEl("🌿","點右上角 + 新增"));return;}
+  appendDateGroup(sl,sarr,function(l,idx){
+    var origIdx=supp.indexOf(l);idx=origIdx>=0?origIdx:idx;
+    return makeLcWrap(SICONS[l.type]||"🌿","#f5edf8",l.name,l.type+" · "+l.dose+(l.note?" · "+l.note:""),fmtD(l.date)+" "+l.time,"del('supp',"+idx+")",null);
+  });
+}
+
+function setPeriod(d,btn){statsPeriod=d;document.querySelectorAll(".period-btn").forEach(function(b){b.classList.remove("on");});btn.classList.add("on");renderStats();}
+function topItems(arr,key){
+  var m={};
+  for(var i=0;i<arr.length;i++) m[arr[i][key]]=(m[arr[i][key]]||0)+1;
+  var r=[];for(var k in m){if(Object.prototype.hasOwnProperty.call(m,k))r.push({name:k,count:m[k]});}
+  return r.sort(function(a,b){return b.count-a.count;});
+}
+function renderStats(){
+  var dates=[],d;
+  for(var i=statsPeriod-1;i>=0;i--) dates.push(todayStr(-i));
+  var start=dates[0];
+  var fL=[],pL=[],mL=[],sL=[];
+  for(var i=0;i<food.length;i++){if(food[i].date>=start)fL.push(food[i]);}
+  for(var i=0;i<poop.length;i++){if(poop[i].date>=start)pL.push(poop[i]);}
+  for(var i=0;i<med.length;i++){if(med[i].date>=start)mL.push(med[i]);}
+  for(var i=0;i<supp.length;i++){if(supp[i].date>=start)sL.push(supp[i]);}
+
+  function barCounts(arr){return dates.map(function(d){var c=0;for(var i=0;i<arr.length;i++){if(arr[i].date===d)c++;}return c;});}
+  function dayLbl(i){var dobj=new Date(dates[i]+"T12:00:00");if(statsPeriod<=7)return["日","一","二","三","四","五","六"][dobj.getDay()];return i%2===0?fmtD(dates[i]):"";}
+
+  var el=clearEl("statsContent");
+
+  function makeBlock(title,arr,color,paleBg,keyField,label1,label3,alertFn){
+    var counts=barCounts(arr);
+    var maxC=1;for(var i=0;i<counts.length;i++){if(counts[i]>maxC)maxC=counts[i];}
+    var avg=(arr.length/statsPeriod).toFixed(1);
+    var top=topItems(arr,keyField);
+    var alertCnt=alertFn?alertFn(arr):0;
+    var val3=alertFn?alertCnt:top.length;
+    var isWarn=alertFn?alertCnt>0:false;
+
+    var card=document.createElement("div");card.className="card";card.style.marginBottom="12px";
+
+    var titleEl=document.createElement("div");titleEl.style.cssText="font-family:serif;font-size:13px;font-weight:500;margin-bottom:12px";titleEl.textContent=title;
+    card.appendChild(titleEl);
+
+    var kpi=document.createElement("div");kpi.className="kpi-row";
+    kpi.innerHTML="<div><div class='kpi-val'>"+arr.length+"</div><div class='kpi-lbl'>"+label1+"</div></div>"
+      +"<div><div class='kpi-val'>"+avg+"</div><div class='kpi-lbl'>日均</div></div>"
+      +"<div><div class='kpi-val' style='color:"+(alertFn&&alertCnt>0?"#e07e6a":"#2d2a26")+"'>"+val3+"</div><div class='kpi-lbl'>"+label3+"</div></div>";
+    card.appendChild(kpi);
+
+    var barWrap=document.createElement("div");barWrap.className="bar-wrap";
+    for(var i=0;i<counts.length;i++){
+      var pct=Math.round(counts[i]/maxC*100);
+      var hi=counts[i]===maxC&&counts[i]>0;
+      var col=document.createElement("div");col.className="bar-col";
+      var fill=document.createElement("div");fill.className="bar-fill";
+      fill.style.cssText="height:"+Math.max(pct,counts[i]>0?5:2)+"%;background:"+(hi?color:paleBg);
+      var lbl=document.createElement("div");lbl.className="bar-lbl";lbl.textContent=dayLbl(i);
+      col.appendChild(fill);col.appendChild(lbl);barWrap.appendChild(col);
+    }
+    card.appendChild(barWrap);
+
+    if(top.length){
+      var topLbl=document.createElement("div");topLbl.style.cssText="font-size:10px;color:#b0aa9f;margin:10px 0 6px";topLbl.textContent="Top 3";card.appendChild(topLbl);
+      for(var i=0;i<Math.min(3,top.length);i++){
+        var row=document.createElement("div");row.className="top-row";
+        row.innerHTML="<div class='top-name'>"+esc(top[i].name)+"</div><div class='top-bar-bg'><div class='top-bar-fill' style='width:"+Math.round(top[i].count/top[0].count*100)+"%;background:"+color+"'></div></div><div class='top-count'>"+top[i].count+"</div>";
+        card.appendChild(row);
+      }
+    }
+
+    var ins=document.createElement("div");ins.className="insight";
+    ins.style.cssText="background:"+(isWarn?"#fceee8":"#e8f0ea")+";color:"+(isWarn?"#e07e6a":"#7a9e87");
+    if(alertFn) ins.textContent=alertCnt>0?"⚠️ 有 "+alertCnt+" 次異常排便，建議諮詢獸醫":arr.length===0?"📋 本期尚無排便紀錄":"✅ 排便狀況正常！";
+    else ins.textContent=arr.length===0?"📋 本期尚無紀錄":"✅ 本期共 "+arr.length+" 筆，持續記錄中！";
+    card.appendChild(ins);
+    return card;
+  }
+
+  el.appendChild(makeBlock("🍖 飲食統計",fL,"#d4a853","#faf3e0","type","總餐數","種類",null));
+  el.appendChild(makeBlock("🚽 排便統計",pL,"#a07850","#f5ede4","shape","總次數","異常次數",function(a){var c=0;for(var i=0;i<a.length;i++){if(["有血","拉稀","黏液"].indexOf(a[i].shape)>=0)c++;}return c;}));
+  el.appendChild(makeBlock("💊 用藥統計",mL,"#7b8ec8","#eef0fa","name","給藥次數","種類",null));
+  el.appendChild(makeBlock("🌿 保健統計",sL,"#b07ab8","#f5edf8","name","給予次數","種類",null));
 }
 
 function exportData(){
-localStorage.setItem(“lastExport”,new Date().toISOString());
-var data=JSON.stringify({pet:pet,food:food,health:health,vaccines:vaccines,med:med,poop:poop,suppList:suppList,supp:supp,mPre:mPre,sPre:sPre,fPre:fPre,exportedAt:new Date().toISOString()},null,2);
-var blob=new Blob([data],{type:“application/json”});
-var url=URL.createObjectURL(blob);
-var a=document.createElement(“a”);
-a.href=url;
-var dn=new Date();
-a.download=pet.name+“日記備份_”+dn.getFullYear()+(dn.getMonth()+1)+dn.getDate()+”.json”;
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-URL.revokeObjectURL(url);
+  localStorage.setItem("lastExport",new Date().toISOString());
+  var data=JSON.stringify({pet:pet,food:food,health:health,vaccines:vaccines,med:med,poop:poop,suppList:suppList,supp:supp,mPre:mPre,sPre:sPre,fPre:fPre,exportedAt:new Date().toISOString()},null,2);
+  var blob=new Blob([data],{type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;
+  var dn=new Date();
+  a.download=pet.name+"日記備份_"+dn.getFullYear()+(dn.getMonth()+1)+dn.getDate()+".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 function importData(){
-var input=document.createElement(“input”);
-input.type=“file”;input.accept=”.json”;
-input.onchange=function(e){
-var file=e.target.files[0];if(!file)return;
-var reader=new FileReader();
-reader.onload=function(ev){
-try{
-var d=JSON.parse(ev.target.result);
-if(d.food)food=d.food;if(d.health)health=d.health;if(d.vaccines)vaccines=d.vaccines;
-if(d.med)med=d.med;if(d.poop)poop=d.poop;if(d.suppList)suppList=d.suppList;
-if(d.supp)supp=d.supp;if(d.mPre)mPre=d.mPre;if(d.sPre)sPre=d.sPre;if(d.fPre)fPre=d.fPre;
-if(d.pet){pet=d.pet;}else{pet={name:“小橘”,breed:“橘貓”,age:“3 歲”,gender:“♂”};}
-saveDB();renderAll();updatePetHeader();
-alert(“✅ 匯入成功！”);
-}catch(err){alert(“❌ 匯入失敗，請確認檔案格式”);}
-};
-reader.readAsText(file);
-};
-input.click();
+  var input=document.createElement("input");
+  input.type="file";input.accept=".json";
+  input.onchange=function(e){
+    var file=e.target.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        var d=JSON.parse(ev.target.result);
+        if(d.food)food=d.food;if(d.health)health=d.health;if(d.vaccines)vaccines=d.vaccines;
+        if(d.med)med=d.med;if(d.poop)poop=d.poop;if(d.suppList)suppList=d.suppList;
+        if(d.supp)supp=d.supp;if(d.mPre)mPre=d.mPre;if(d.sPre)sPre=d.sPre;if(d.fPre)fPre=d.fPre;
+        if(d.pet){pet=d.pet;}else{pet={name:"小橘",breed:"橘貓",age:"3 歲",gender:"♂"};}
+        saveDB();renderAll();updatePetHeader();
+        alert("✅ 匯入成功！");
+      }catch(err){alert("❌ 匯入失敗，請確認檔案格式");}
+    };
+    reader.readAsText(file);
+  };
+  input.click();
 }
 function renderAll(){
-checkDailyReset();
-renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
-if(currentTab===6)renderStats();
+  checkDailyReset();
+  renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
+  if(currentTab===6)renderStats();
 }
 renderAll();
 
-Food();renderHealth();renderMed();renderPoop();renderSupp();
-if(currentTab===6)renderStats();
-}
-renderAll();
 
 </script>
+
 </body>
 </html>
