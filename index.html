@@ -168,6 +168,13 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 .wt-input-row{display:flex;gap:8px;align-items:center;margin-top:6px}
 .wt-input-row input{flex:1;padding:9px 12px;border:1.5px solid #e4dfd8;border-radius:10px;font-size:18px;font-family:serif;color:#7a9e87;background:#f5f2ee;outline:none;text-align:center}
 .wt-input-row span{font-size:13px;color:#7a766f}
+
+/* date range filter */
+.dr-wrap{display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.dr-label{font-size:10px;color:#b0aa9f;flex-shrink:0}
+.dr-select{padding:6px 8px;border:1.5px solid #e4dfd8;border-radius:8px;font-family:inherit;font-size:11px;color:#2d2a26;background:#fdfbf8;outline:none;-webkit-appearance:none;cursor:pointer}
+.dr-select.on{border-color:#7a9e87;background:#e8f0ea;color:#7a9e87}
+.dr-clear{padding:5px 9px;border-radius:20px;border:1px solid #e4dfd8;background:transparent;font-size:10px;color:#b0aa9f;cursor:pointer;font-family:inherit}
 </style>
 
 </head>
@@ -242,7 +249,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
       <button class="circ-btn" onclick="openModal('food')">+</button>
     </div>
   </div>
-  <input class="search-bar" id="foodSearch" placeholder="🔍 搜尋飲食紀錄..." oninput="renderFood()">
+  <div id="dateRangeFood"></div>
   <div id="foodLogs"></div>
 </div>
 
@@ -250,13 +257,10 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 <div class="sec" id="sec-2">
   <div class="sec-hdr">
-    <div class="sec-title">疫苗 &amp; 健康</div>
+    <div class="sec-title">健康紀錄</div>
     <button class="circ-btn" onclick="openModal('health')">+</button>
   </div>
-  <div class="sec-sub" style="margin-bottom:8px">疫苗時間軸</div>
-  <div class="timeline" id="vaccineTimeline"></div>
-  <div class="sec-sub" style="margin-bottom:8px">健康紀錄</div>
-  <input class="search-bar" id="healthSearch" placeholder="🔍 搜尋健康紀錄..." oninput="renderHealth()">
+  <div id="dateRangeHealth"></div>
   <div id="healthLogs"></div>
 </div>
 
@@ -272,7 +276,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
   </div>
   <div id="medSchedules"></div>
   <div class="sec-sub" style="margin-bottom:8px;margin-top:4px">給藥紀錄</div>
-  <input class="search-bar" id="medSearch" placeholder="🔍 搜尋用藥紀錄..." oninput="renderMed()">
+  <div id="dateRangeMed"></div>
   <div id="medLogs"></div>
 </div>
 
@@ -287,6 +291,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
     <div class="card"><div class="stat-label">今日次數</div><div class="stat-val" id="poopCnt">0<span class="stat-unit">次</span></div><div class="stat-sub">正常 1-2 次</div></div>
     <div class="card"><div class="stat-label">上次紀錄</div><div class="stat-val" style="font-size:15px;margin-top:4px" id="poopLast">—</div><div class="stat-sub" id="poopLastShape"></div></div>
   </div>
+  <div id="dateRangePoop"></div>
   <div id="poopLogs"></div>
 </div>
 
@@ -303,6 +308,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
   <div class="sec-sub" style="margin-bottom:8px">今日打卡</div>
   <div class="supp-grid" id="suppGrid"></div>
   <div class="sec-sub" style="margin-bottom:8px">給予紀錄</div>
+  <div id="dateRangeSupp"></div>
   <div id="suppLogs"></div>
 </div>
 
@@ -514,12 +520,13 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 <script>
 
 
+
 var KEY="nekoDiary_v5";
 var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","其他":"🌿"};
 var VSTAT={done:{label:"已完成",color:"#7a9e87",bg:"#e8f0ea"},upcoming:{label:"即將到期",color:"#e07e6a",bg:"#fceee8"},due:{label:"建議預約",color:"#d97706",bg:"#fef3c7"}};
 
 function todayStr(n){n=n||0;var d=new Date();d.setDate(d.getDate()+n);return d.toISOString().split("T")[0];}
-function fmtD(s){if(!s)return"";var d=new Date(s+"T12:00:00");return(d.getMonth()+1)+"/"+(d.getDate());}
+function fmtD(s){if(!s)return"";var d=new Date(s+"T12:00:00");return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate();}
 function friendly(s){if(!s)return"";if(s===todayStr())return"今天";if(s===todayStr(-1))return"昨天";return fmtD(s);}
 function nowTime(){return new Date().toTimeString().slice(0,5);}
 function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
@@ -561,6 +568,49 @@ function checkDailyReset(){
     localStorage.setItem("lastDay",today);
     saveDB();
   }
+}
+
+// ── Date range filter ─────────────────────────────────────────────────────
+var dateFilters={};
+function getDateFilter(key){return dateFilters[key]||"all";}
+function filterByDate(l,filter){
+  if(!filter||filter==="all")return true;
+  var d=l.date;
+  var now=todayStr();
+  if(filter==="7")return d>=todayStr(-6);
+  if(filter==="30")return d>=todayStr(-29);
+  if(filter==="90")return d>=todayStr(-89);
+  if(filter==="thisMonth"){
+    var dn=new Date();
+    var m=String(dn.getMonth()+1).padStart(2,"0");
+    return d.startsWith(dn.getFullYear()+"-"+m);
+  }
+  return true;
+}
+function renderDateRange(containerId,key){
+  var el=document.getElementById(containerId);
+  if(!el)return;
+  while(el.firstChild)el.removeChild(el.firstChild);
+  var wrap=document.createElement("div");wrap.className="dr-wrap";
+  var lbl=document.createElement("span");lbl.className="dr-label";lbl.textContent="篩選：";
+  wrap.appendChild(lbl);
+  var opts=[["all","全部"],["7","近7天"],["30","近30天"],["90","近3個月"],["thisMonth","本月"]];
+  var cur=getDateFilter(key);
+  opts.forEach(function(o){
+    var btn=document.createElement("button");
+    btn.className="dr-select"+(o[0]===cur?" on":"");
+    btn.textContent=o[1];
+    btn.onclick=(function(val,k){return function(){
+      dateFilters[k]=val;
+      if(k==="food")renderFood();
+      else if(k==="health")renderHealth();
+      else if(k==="med")renderMed();
+      else if(k==="poop")renderPoop();
+      else if(k==="supp")renderSupp();
+    };})(o[0],key);
+    wrap.appendChild(btn);
+  });
+  el.appendChild(wrap);
 }
 function renderReminders(){
   var el=document.getElementById("reminders");
@@ -1093,9 +1143,10 @@ function renderHome(){
 
 function renderFood(){
   var el=clearEl("foodLogs");
-  var q=(document.getElementById("foodSearch")||{}).value||"";q=q.toLowerCase();
-  var arr=food.filter(function(l){return !q||(l.name||"").toLowerCase().indexOf(q)>=0||(l.type||"").toLowerCase().indexOf(q)>=0||(l.note||"").toLowerCase().indexOf(q)>=0;});
-  if(!arr.length){el.appendChild(emptyEl("🍽️",q?"沒有符合的紀錄":"點右上角 + 新增"));return;}
+  renderDateRange("dateRangeFood","food");
+  var df=getDateFilter("food");
+  var arr=food.filter(function(l){return filterByDate(l,df);});
+  if(!arr.length){el.appendChild(emptyEl("🍽️","點右上角 + 新增"));return;}
   appendDateGroup(el,arr,function(l,idx){
     var origIdx=food.indexOf(l);idx=origIdx>=0?origIdx:idx;
     var icon=l.type==="水"?"💧":l.type==="乾食"?"🥣":"🍽️";
@@ -1105,26 +1156,15 @@ function renderFood(){
 }
 
 function renderHealth(){
-  var tl=clearEl("vaccineTimeline");
-  if(!vaccines.length){var d=document.createElement("div");d.style.cssText="font-size:11px;color:#b0aa9f;margin-bottom:12px";d.textContent="尚無疫苗紀錄";tl.appendChild(d);}
-  else{
-    vaccines.forEach(function(v){
-      var vs=VSTAT[v.status]||VSTAT.done;
-      var item=document.createElement("div");item.className="tl-item";
-      var dot=document.createElement("div");dot.className="tl-dot";dot.style.background=vs.color;
-      var card=document.createElement("div");card.className="tl-card";
-      card.innerHTML="<div class='tl-name'>"+esc(v.name)+"</div><div class='tl-date'>接種："+fmtD(v.date)+" · 下次："+fmtD(v.next)+"</div><span class='badge' style='background:"+vs.bg+";color:"+vs.color+"'>"+vs.label+"</span>";
-      item.appendChild(dot);item.appendChild(card);tl.appendChild(item);
-    });
-  }
   var hl=clearEl("healthLogs");
-  var q2=(document.getElementById("healthSearch")||{}).value||"";q2=q2.toLowerCase();
-  var harr=health.filter(function(l){return !q2||(l.name||"").toLowerCase().indexOf(q2)>=0||(l.type||"").toLowerCase().indexOf(q2)>=0;});
-  if(!harr.length){hl.appendChild(emptyEl("🏥",q2?"沒有符合的紀錄":"點右上角 + 新增"));return;}
+  renderDateRange("dateRangeHealth","health");
+  var df=getDateFilter("health");
   var HI={"疫苗":"💉","回診":"🏥","體重":"⚖️","症狀":"🩺"};
+  var harr=health.filter(function(l){return filterByDate(l,df);});
+  if(!harr.length){hl.appendChild(emptyEl("🏥","點右上角 + 新增"));return;}
   appendDateGroup(hl,harr,function(l,idx){
     var origIdx=health.indexOf(l);idx=origIdx>=0?origIdx:idx;
-    return makeLcWrap(HI[l.type]||"📋","#fceee8",l.name||l.type,l.type+(l.note?" · "+l.note:""),fmtD(l.date),"del('health',"+idx+")",null);
+    return makeLcWrap(HI[l.type]||"📋","#fceee8",l.name||l.type,l.type+(l.note?" · "+l.note:""),fmtD(l.date)+(l.time?" "+l.time:""),"del('health',"+idx+")",null);
   });
 }
 
@@ -1147,9 +1187,10 @@ function renderMed(){
     });
   }
   var ml=clearEl("medLogs");
-  var q3=(document.getElementById("medSearch")||{}).value||"";q3=q3.toLowerCase();
-  var marr=med.filter(function(l){return !q3||(l.name||"").toLowerCase().indexOf(q3)>=0;});
-  if(!marr.length){ml.appendChild(emptyEl("💊",q3?"沒有符合的紀錄":"點右上角 + 新增"));return;}
+  renderDateRange("dateRangeMed","med");
+  var df3=getDateFilter("med");
+  var marr=med.filter(function(l){return filterByDate(l,df3);});
+  if(!marr.length){ml.appendChild(emptyEl("💊","點右上角 + 新增"));return;}
   appendDateGroup(ml,marr,function(l,idx){
     var origIdx=med.indexOf(l);idx=origIdx>=0?origIdx:idx;
     return makeLcWrap("💊","#eef0fa",l.name,l.method+" · "+l.dose+(l.note?" · "+l.note:""),fmtD(l.date)+" "+l.time,"del('med',"+idx+")","openEditMed("+idx+")");
@@ -1163,8 +1204,11 @@ function renderPoop(){
   if(sp.length){document.getElementById("poopLast").textContent=friendly(sp[0].date)+" "+sp[0].time;document.getElementById("poopLastShape").textContent=sp[0].shape;}
   var ALERT=["有血","拉稀","黏液"];
   var el=clearEl("poopLogs");
-  if(!poop.length){el.appendChild(emptyEl("🚽","點右上角 + 新增"));return;}
-  var sorted=poop.map(function(item,i){return{item:item,idx:i};}).sort(function(a,b){return(b.item.date+(b.item.time||"00:00")).localeCompare(a.item.date+(a.item.time||"00:00"));});
+  renderDateRange("dateRangePoop","poop");
+  var dfp=getDateFilter("poop");
+  var filteredPoop=poop.filter(function(l){return filterByDate(l,dfp);});
+  if(!filteredPoop.length){el.appendChild(emptyEl("🚽","點右上角 + 新增"));return;}
+  var sorted=filteredPoop.map(function(item,i){return{item:item,idx:poop.indexOf(item)};}).sort(function(a,b){return(b.item.date+(b.item.time||"00:00")).localeCompare(a.item.date+(a.item.time||"00:00"));});
   var last="";
   sorted.forEach(function(o){
     var l=o.item,idx=o.idx;
@@ -1200,8 +1244,12 @@ function renderSupp(){
     });
   }
   var sl=clearEl("suppLogs");
-  if(!supp.length){sl.appendChild(emptyEl("🌿","點右上角 + 新增"));return;}
-  appendDateGroup(sl,supp,function(l,idx){
+  renderDateRange("dateRangeSupp","supp");
+  var dfs=getDateFilter("supp");
+  var sarr=supp.filter(function(l){return filterByDate(l,dfs);});
+  if(!sarr.length){sl.appendChild(emptyEl("🌿","點右上角 + 新增"));return;}
+  appendDateGroup(sl,sarr,function(l,idx){
+    var origIdx=supp.indexOf(l);idx=origIdx>=0?origIdx:idx;
     return makeLcWrap(SICONS[l.type]||"🌿","#f5edf8",l.name,l.type+" · "+l.dose+(l.note?" · "+l.note:""),fmtD(l.date)+" "+l.time,"del('supp',"+idx+")",null);
   });
 }
@@ -1324,6 +1372,7 @@ function renderAll(){
   if(currentTab===6)renderStats();
 }
 renderAll();
+
 
 
 </script>
