@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -176,13 +175,11 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 .dr-select.on{border-color:#7a9e87;background:#e8f0ea;color:#7a9e87}
 .dr-clear{padding:5px 9px;border-radius:20px;border:1px solid #e4dfd8;background:transparent;font-size:10px;color:#b0aa9f;cursor:pointer;font-family:inherit}
 </style>
-
 </head>
 <body>
 <div class="app">
 
 <!-- HEADER -->
-
 <div class="hdr">
   <div class="hdr-top">
     <div class="pet-row" onclick="openModal('pet')">
@@ -212,11 +209,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- CONTENT -->
-
 <div class="content">
 
 <!-- HOME -->
-
 <div class="sec on" id="sec-0">
   <div id="reminders"></div>
   <div class="today-note"><span>✨</span><span id="homeNote">今天是美好的一天！</span></div>
@@ -240,7 +235,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- FOOD -->
-
 <div class="sec" id="sec-1">
   <div class="sec-hdr">
     <div class="sec-title">飲食紀錄</div>
@@ -254,7 +248,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- HEALTH -->
-
 <div class="sec" id="sec-2">
   <div class="sec-hdr">
     <div class="sec-title">健康紀錄</div>
@@ -265,7 +258,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- MED -->
-
 <div class="sec" id="sec-3">
   <div class="sec-hdr">
     <div class="sec-title">用藥紀錄</div>
@@ -283,7 +275,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- POOP -->
-
 <div class="sec" id="sec-4">
   <div class="sec-hdr">
     <div class="sec-title">排便紀錄</div>
@@ -298,7 +289,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- SUPP -->
-
 <div class="sec" id="sec-5">
   <div class="sec-hdr">
     <div class="sec-title">保健食品</div>
@@ -315,7 +305,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- STATS -->
-
 <div class="sec" id="sec-6">
   <div class="period-row">
     <button class="period-btn on" onclick="setPeriod(7,this)">本週</button>
@@ -328,7 +317,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div><!-- /content -->
 
 <!-- BOTTOM NAV -->
-
 <div class="bnav">
   <button class="nav-btn on" onclick="goNav(0,this)"><span class="nav-icon">🏠</span><span class="nav-lbl">總覽</span></button>
   <button class="nav-btn" onclick="goNav(1,this)"><span class="nav-icon">🍖</span><span class="nav-lbl">飲食</span></button>
@@ -341,7 +329,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div><!-- /app -->
 
 <!-- MODALS -->
-
 <div class="modal-bg" id="m-pet" onclick="bgClose(event,'m-pet')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯寵物資料</div>
   <div class="f-group"><label class="f-label">名字</label><input class="f-input" id="pef-name" placeholder="小橘"></div>
@@ -521,6 +508,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 
 
+
 var KEY="nekoDiary_v5";
 var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","其他":"🌿"};
 var VSTAT={done:{label:"已完成",color:"#7a9e87",bg:"#e8f0ea"},upcoming:{label:"即將到期",color:"#e07e6a",bg:"#fceee8"},due:{label:"建議預約",color:"#d97706",bg:"#fef3c7"}};
@@ -573,7 +561,18 @@ var medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medChecki
 function checkDailyReset(){
   var today=todayStr();
   var lastDay=localStorage.getItem("lastDay");
-  // Always sync doneToday and medCheckin from actual log data
+  if(lastDay!==today){
+    // 新的一天：清空所有打卡狀態
+    suppList.forEach(function(s){s.doneToday=false;});
+    medCheckin={};
+    localStorage.setItem("lastDay",today);
+    localStorage.setItem("medCheckin","{}");
+    saveDB();
+  }
+}
+function syncCheckinFromLogs(){
+  // 只在頁面載入時呼叫一次，從今日實際紀錄同步打卡狀態
+  var today=todayStr();
   suppList.forEach(function(s){
     s.doneToday=supp.some(function(l){return l.date===today&&l.name===s.name;});
   });
@@ -581,9 +580,6 @@ function checkDailyReset(){
   med.forEach(function(l){if(l.date===today&&l.method==="打卡")todayMedNames[l.name]=l.time;});
   medCheckin=todayMedNames;
   localStorage.setItem("medCheckin",JSON.stringify(medCheckin));
-  if(lastDay!==today){
-    localStorage.setItem("lastDay",today);
-  }
 }
 
 // ── Date range filter ─────────────────────────────────────────────────────
@@ -678,7 +674,7 @@ function renderReminders(){
 function refreshDateDisplay(){
   var dn=new Date();
   document.getElementById("dateDisplay").textContent=(dn.getMonth()+1)+"月"+dn.getDate()+"日";
-  // Also re-check daily reset in case day changed
+  // 每分鐘檢查是否跨日，跨日才清空打卡
   checkDailyReset();
   setTimeout(refreshDateDisplay,60000);
 }
@@ -1064,15 +1060,18 @@ function saveSupp(){
 function toggleSupp(i){
   var s=suppList[i];
   var today=todayStr();
-  var alreadyDone=supp.some(function(l){return l.date===today&&l.name===s.name;});
+  var alreadyDone=suppList[i].doneToday;
   if(!alreadyDone){
     supp.unshift({name:s.name,type:s.type,dose:s.dose,time:nowTime(),note:"",date:today});
+    suppList[i].doneToday=true;
   } else {
     // undo - remove today's log
-    var idx=-1;for(var fi=0;fi<supp.length;fi++){if(supp[fi].date===today&&supp[fi].name===s.name){idx=fi;break;}}
+    var idx=-1;
+    for(var fi=0;fi<supp.length;fi++){if(supp[fi].date===today&&supp[fi].name===s.name){idx=fi;break;}}
     if(idx>=0)supp.splice(idx,1);
+    suppList[i].doneToday=false;
   }
-  saveDB();checkDailyReset();renderSupp();renderHome();
+  saveDB();renderSupp();renderHome();
 }
 function toggleMedCheckin(name){
   var today=todayStr();
@@ -1081,13 +1080,16 @@ function toggleMedCheckin(name){
     if(med[i].date===today&&med[i].method==="打卡"&&med[i].name===name){existIdx=i;break;}
   }
   if(existIdx>=0){
-    // undo - remove today's log
+    // 取消打卡
     med.splice(existIdx,1);
+    delete medCheckin[name];
   } else {
-    // add log
+    // 打卡
     med.unshift({name:name,dose:"",time:nowTime(),method:"打卡",start:"",end:"",note:"今日已給藥",date:today});
+    medCheckin[name]=nowTime();
   }
-  saveDB();checkDailyReset();renderMedCheckin();renderMed();
+  localStorage.setItem("medCheckin",JSON.stringify(medCheckin));
+  saveDB();renderMedCheckin();renderMed();
 }
 function renderMedCheckin(){
   var el=document.getElementById("medCheckinGrid");
@@ -1436,16 +1438,18 @@ function importData(){
   input.click();
 }
 function renderAll(){
-  checkDailyReset();
   renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
   if(currentTab===6)renderStats();
 }
+// 頁面載入時：先檢查是否跨日，再從紀錄同步打卡狀態
+checkDailyReset();
+syncCheckinFromLogs();
 renderAll();
 
 
 
 
-</script>
 
+</script>
 </body>
 </html>
