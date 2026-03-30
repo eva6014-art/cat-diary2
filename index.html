@@ -523,6 +523,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 
 
+
 var KEY="nekoDiary_v5";
 var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","護肝":"🫀","護腎":"🫘","其他":"🌿"};
 var VSTAT={done:{label:"已完成",color:"#7a9e87",bg:"#e8f0ea"},upcoming:{label:"即將到期",color:"#e07e6a",bg:"#fceee8"},due:{label:"建議預約",color:"#d97706",bg:"#fef3c7"}};
@@ -969,8 +970,9 @@ function renderFoodPresetList(){
     card.innerHTML="<div class='pre-icon' style='background:#faf3e0'>🍽️</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.type)+(p.amount?" · "+p.amount+"g":"")+"</div></div>";
     var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
     var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#faf3e0;color:#d4a853";ub.textContent="使用";ub.onclick=function(){useFoodPreFromList(i);};
+    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.onclick=(function(i){return function(){closeModal("m-foodPreset");setTimeout(function(){openEditFoodPre(i);},200);};})(i);
     var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.onclick=function(){delFoodPre(i);};
-    acts.appendChild(ub);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
+    acts.appendChild(ub);acts.appendChild(eb);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
   });
 }
 function useFoodPreFromList(i){var p=fPre[i];closeModal("m-foodPreset");setTimeout(function(){openModal("food");useFoodPre(i);},200);}
@@ -1049,8 +1051,9 @@ function renderMedPresetList(){
     card.innerHTML="<div class='pre-icon' style='background:#eef0fa'>💊</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.dose)+" · "+esc(p.method)+(p.note?" · "+esc(p.note):"")+"</div></div>";
     var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
     var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#eef0fa;color:#7b8ec8";ub.textContent="使用";ub.onclick=function(){useMedPreFromList(i);};
+    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.onclick=(function(i){return function(){closeModal("m-medPreset");setTimeout(function(){openEditMedPre(i);},200);};})(i);
     var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.onclick=function(){delMedPre(i);};
-    acts.appendChild(ub);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
+    acts.appendChild(ub);acts.appendChild(eb);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
   });
 }
 function useMedPreFromList(i){closeModal("m-medPreset");setTimeout(function(){openModal("med");useMedPre(i);},200);}
@@ -1163,8 +1166,9 @@ function renderSuppPresetList(){
     card.innerHTML="<div class='pre-icon' style='background:#f5edf8'>"+(SICONS[p.type]||"🌿")+"</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.dose)+" · "+esc(p.type)+(p.brand?" · "+esc(p.brand):"")+"</div></div>";
     var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
     var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#f5edf8;color:#b07ab8";ub.textContent="使用";ub.onclick=function(){useSuppPreFromList(i);};
+    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.onclick=(function(i){return function(){closeModal("m-suppPreset");setTimeout(function(){openEditSuppPre(i);},200);};})(i);
     var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.onclick=function(){delSuppPre(i);};
-    acts.appendChild(ub);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
+    acts.appendChild(ub);acts.appendChild(eb);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
   });
 }
 function useSuppPreFromList(i){closeModal("m-suppPreset");setTimeout(function(){openModal("supp");useSuppPre(i);},200);}
@@ -1464,6 +1468,73 @@ function importData(){
   };
   input.click();
 }
+
+// ── Preset edit functions ────────────────────────────────────────────────────
+var editFoodPreIdx=-1, editMedPreIdx=-1, editSuppPreIdx=-1;
+
+function openEditFoodPre(i){
+  editFoodPreIdx=i;
+  var p=fPre[i];
+  document.getElementById("efp-name").value=p.name;
+  document.getElementById("efp-type").value=p.type;
+  document.getElementById("efp-amount").value=p.amount||"";
+  document.getElementById("m-editFoodPre").classList.add("open");
+}
+function saveEditFoodPre(){
+  if(editFoodPreIdx<0)return;
+  fPre[editFoodPreIdx]={
+    name:document.getElementById("efp-name").value,
+    type:document.getElementById("efp-type").value,
+    amount:document.getElementById("efp-amount").value
+  };
+  editFoodPreIdx=-1;
+  closeModal("m-editFoodPre");
+  saveDB();renderFoodPresetList();
+}
+
+function openEditMedPre(i){
+  editMedPreIdx=i;
+  var p=mPre[i];
+  document.getElementById("emp-name").value=p.name;
+  document.getElementById("emp-dose").value=p.dose||"";
+  document.getElementById("emp-method").value=p.method||"口服";
+  document.getElementById("emp-note").value=p.note||"";
+  document.getElementById("m-editMedPre").classList.add("open");
+}
+function saveEditMedPre(){
+  if(editMedPreIdx<0)return;
+  mPre[editMedPreIdx]={
+    name:document.getElementById("emp-name").value,
+    dose:document.getElementById("emp-dose").value,
+    method:document.getElementById("emp-method").value,
+    note:document.getElementById("emp-note").value
+  };
+  editMedPreIdx=-1;
+  closeModal("m-editMedPre");
+  saveDB();renderMedPresetList();renderMedCheckin();
+}
+
+function openEditSuppPre(i){
+  editSuppPreIdx=i;
+  var p=sPre[i];
+  document.getElementById("esp-name").value=p.name;
+  document.getElementById("esp-dose").value=p.dose||"";
+  document.getElementById("esp-type").value=p.type||"其他";
+  document.getElementById("esp-brand").value=p.brand||"";
+  document.getElementById("m-editSuppPre").classList.add("open");
+}
+function saveEditSuppPre(){
+  if(editSuppPreIdx<0)return;
+  sPre[editSuppPreIdx]={
+    name:document.getElementById("esp-name").value,
+    dose:document.getElementById("esp-dose").value,
+    type:document.getElementById("esp-type").value,
+    brand:document.getElementById("esp-brand").value
+  };
+  editSuppPreIdx=-1;
+  closeModal("m-editSuppPre");
+  saveDB();renderSuppPresetList();renderSupp();
+}
 function renderAll(){
   renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
   if(currentTab===6)renderStats();
@@ -1478,7 +1549,45 @@ renderAll();
 
 
 
+
 </script>
 
+<!-- Edit Food Preset -->
+
+<div class="modal-bg" id="m-editFoodPre" onclick="bgClose(event,'m-editFoodPre')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用食物</div>
+  <div class="f-group"><label class="f-label">品牌 / 名稱</label><input class="f-input" id="efp-name"></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">種類</label><select class="f-select" id="efp-type"><option>主食罐</option><option>副食罐</option><option>乾食</option><option>零食</option><option>水</option></select></div>
+    <div class="f-group"><label class="f-label">慣用份量(g)</label><input class="f-input" id="efp-amount" type="number"></div>
+  </div>
+  <button class="pri-btn" style="background:#d4a853" onclick="saveEditFoodPre()">儲存修改</button>
+</div></div>
+
+<!-- Edit Med Preset -->
+
+<div class="modal-bg" id="m-editMedPre" onclick="bgClose(event,'m-editMedPre')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用藥品</div>
+  <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="emp-name"></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="emp-dose"></div>
+    <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="emp-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
+  </div>
+  <div class="f-group"><label class="f-label">備註</label><input class="f-input" id="emp-note"></div>
+  <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMedPre()">儲存修改</button>
+</div></div>
+
+<!-- Edit Supp Preset -->
+
+<div class="modal-bg" id="m-editSuppPre" onclick="bgClose(event,'m-editSuppPre')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用保健品</div>
+  <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="esp-name"></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="esp-dose"></div>
+    <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="esp-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
+  </div>
+  <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="esp-brand"></div>
+  <button class="pri-btn" style="background:#b07ab8" onclick="saveEditSuppPre()">儲存修改</button>
+</div></div>
 </body>
 </html>
