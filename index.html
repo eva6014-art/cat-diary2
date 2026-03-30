@@ -457,7 +457,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
   <div class="modal-handle"></div><div class="modal-title">🌿 新增保健食品</div>
   <div id="suppQP"></div>
   <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="sf-name" placeholder="e.g. 益生菌"></div>
-  <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="sf-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>其他</option></select></div>
+  <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="sf-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
   <div class="two-col">
     <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="sf-dose" placeholder="1/4茶匙"></div>
     <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="sf-time" type="time"></div>
@@ -475,7 +475,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
     <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="spf-name" placeholder="益生菌"></div>
     <div class="two-col">
       <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="spf-dose" placeholder="1/4茶匙"></div>
-      <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="spf-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>其他</option></select></div>
+      <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="spf-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
     </div>
     <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="spf-brand" placeholder="Zesty Paws"></div>
     <button class="pri-btn" style="background:#b07ab8" onclick="addSuppPre()">加入清單</button>
@@ -524,7 +524,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 
 var KEY="nekoDiary_v5";
-var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","其他":"🌿"};
+var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","護肝":"🫀","護腎":"🫘","其他":"🌿"};
 var VSTAT={done:{label:"已完成",color:"#7a9e87",bg:"#e8f0ea"},upcoming:{label:"即將到期",color:"#e07e6a",bg:"#fceee8"},due:{label:"建議預約",color:"#d97706",bg:"#fef3c7"}};
 
 function todayStr(n){
