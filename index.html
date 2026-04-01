@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -175,14 +174,15 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 .dr-select{padding:6px 8px;border:1.5px solid #e4dfd8;border-radius:8px;font-family:inherit;font-size:11px;color:#2d2a26;background:#fdfbf8;outline:none;-webkit-appearance:none;cursor:pointer}
 .dr-select.on{border-color:#7a9e87;background:#e8f0ea;color:#7a9e87}
 .dr-clear{padding:5px 9px;border-radius:20px;border:1px solid #e4dfd8;background:transparent;font-size:10px;color:#b0aa9f;cursor:pointer;font-family:inherit}
-</style>
 
+.health-type-btn{padding:10px 8px;border:1.5px solid #e4dfd8;border-radius:10px;font-size:13px;text-align:center;cursor:pointer;background:#f5f2ee;color:#7a766f;transition:all .15s}
+.health-type-btn.on{border-color:#7a9e87;background:#e8f0ea;color:#7a9e87;font-weight:500}
+</style>
 </head>
 <body>
 <div class="app">
 
 <!-- HEADER -->
-
 <div class="hdr">
   <div class="hdr-top">
     <div class="pet-row" onclick="openModal('pet')">
@@ -212,11 +212,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- CONTENT -->
-
 <div class="content">
 
 <!-- HOME -->
-
 <div class="sec on" id="sec-0">
   <div id="reminders"></div>
   <div class="today-note"><span>✨</span><span id="homeNote">今天是美好的一天！</span></div>
@@ -240,7 +238,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- FOOD -->
-
 <div class="sec" id="sec-1">
   <div class="sec-hdr">
     <div class="sec-title">飲食紀錄</div>
@@ -254,7 +251,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- HEALTH -->
-
 <div class="sec" id="sec-2">
   <div class="sec-hdr">
     <div class="sec-title">健康紀錄</div>
@@ -265,7 +261,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- MED -->
-
 <div class="sec" id="sec-3">
   <div class="sec-hdr">
     <div class="sec-title">用藥紀錄</div>
@@ -283,7 +278,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- POOP -->
-
 <div class="sec" id="sec-4">
   <div class="sec-hdr">
     <div class="sec-title">排便紀錄</div>
@@ -298,7 +292,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- SUPP -->
-
 <div class="sec" id="sec-5">
   <div class="sec-hdr">
     <div class="sec-title">保健食品</div>
@@ -315,7 +308,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- STATS -->
-
 <div class="sec" id="sec-6">
   <div class="period-row">
     <button class="period-btn on" onclick="setPeriod(7,this)">本週</button>
@@ -328,7 +320,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div><!-- /content -->
 
 <!-- BOTTOM NAV -->
-
 <div class="bnav">
   <button class="nav-btn on" onclick="goNav(0,this)"><span class="nav-icon">🏠</span><span class="nav-lbl">總覽</span></button>
   <button class="nav-btn" onclick="goNav(1,this)"><span class="nav-icon">🍖</span><span class="nav-lbl">飲食</span></button>
@@ -341,7 +332,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div><!-- /app -->
 
 <!-- MODALS -->
-
 <div class="modal-bg" id="m-pet" onclick="bgClose(event,'m-pet')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯寵物資料</div>
   <div class="f-group"><label class="f-label">名字</label><input class="f-input" id="pef-name" placeholder="小橘"></div>
@@ -380,9 +370,18 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div></div>
 
 <div class="modal-bg" id="m-health" onclick="bgClose(event,'m-health')"><div class="modal">
-  <div class="modal-handle"></div><div class="modal-title">💉 新增健康紀錄</div>
-  <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="hf-type" onchange="onHfTypeChange()"><option value="疫苗">疫苗接種</option><option value="回診">定期回診</option><option value="體重">體重量測</option><option value="症狀">症狀觀察</option></select></div>
-  <div class="f-group" id="hf-name-group"><label class="f-label">名稱 / 說明</label><input class="f-input" id="hf-name" placeholder="e.g. 三合一疫苗"></div>
+  <div class="modal-handle"></div><div class="modal-title" id="healthModalTitle">💉 新增健康紀錄</div>
+  <input type="hidden" id="hf-type" value="症狀">
+  <div class="f-group">
+    <label class="f-label">類型</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+      <div class="health-type-btn on" data-v="症狀" onclick="pickHealthType(this)">🩺 症狀觀察</div>
+      <div class="health-type-btn" data-v="體重" onclick="pickHealthType(this)">⚖️ 體重量測</div>
+      <div class="health-type-btn" data-v="回診" onclick="pickHealthType(this)">🏥 定期回診</div>
+      <div class="health-type-btn" data-v="疫苗" onclick="pickHealthType(this)">💉 疫苗接種</div>
+    </div>
+  </div>
+  <div class="f-group" id="hf-name-group"><label class="f-label">名稱 / 說明</label><input class="f-input" id="hf-name" placeholder="e.g. 黃鼻涕、三合一疫苗"></div>
   <div class="f-group" id="hf-wt-group" style="display:none">
     <label class="f-label">體重（kg）</label>
     <div class="wt-input-row">
@@ -428,6 +427,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 <div class="modal-bg" id="m-poop" onclick="bgClose(event,'m-poop')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">🚽 新增排便紀錄</div>
+  <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="pf-date-pick"></div></div>
   <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="pf-time" type="time"></div>
   <div class="f-group"><label class="f-label">形狀 / 質地</label>
     <div class="poop-grid">
@@ -507,17 +507,8 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯用藥紀錄</div>
   <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="em-name"></div>
   <div class="two-col">
-    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="em-dose"></div>
-    <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="em-time" type="time"></div>
-  </div>
-  <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="em-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
-  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="em-note"></textarea></div>
-  <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMed()">儲存修改</button>
-</div></div>
+    <div class="
 
-<div class="toast" id="toast">💾 已自動儲存</div>
-
-<script>
 
 
 
@@ -734,12 +725,14 @@ function openModal(type){
     renderFoodPresetList();
     document.getElementById("m-foodPreset").classList.add("open");
   } else if(type==="health"){
-    document.getElementById("hf-type").value="疫苗";
+    document.getElementById("hf-type").value="症狀";
     document.getElementById("hf-name").value="";
     document.getElementById("hf-note").value="";
     document.getElementById("hf-wt").value="";
     document.getElementById("hf-wt-group").style.display="none";
     document.getElementById("hf-name-group").style.display="block";
+    document.querySelectorAll("#m-health .health-type-btn").forEach(function(b){b.classList.remove("on");});
+    document.querySelector("#m-health .health-type-btn[data-v='症狀']").classList.add("on");
     makeDatePick("hf-date-pick",todayStr());
     makeDatePick("hf-next-pick","");
     document.getElementById("m-health").classList.add("open");
@@ -764,6 +757,7 @@ function openModal(type){
     document.querySelector("[data-v='正常']").classList.add("on");
     document.querySelectorAll(".color-dot").forEach(function(o){o.classList.remove("on");});
     document.querySelector("[data-v='棕色']").classList.add("on");
+    makeDatePick("pf-date-pick",todayStr());
     document.getElementById("m-poop").classList.add("open");
   } else if(type==="supp"){
     document.getElementById("sf-name").value="";
@@ -979,11 +973,20 @@ function renderFoodPresetList(){
 function useFoodPreFromList(i){var p=fPre[i];closeModal("m-foodPreset");setTimeout(function(){openModal("food");useFoodPre(i);},200);}
 function delFoodPre(i){fPre.splice(i,1);saveDB();renderFoodPresetList();}
 
-function onHfTypeChange(){
-  var isWt=document.getElementById("hf-type").value==="體重";
+function pickHealthType(el){
+  document.querySelectorAll("#m-health .health-type-btn").forEach(function(b){b.classList.remove("on");});
+  el.classList.add("on");
+  var val=el.getAttribute("data-v");
+  document.getElementById("hf-type").value=val;
+  var isWt=val==="體重";
   document.getElementById("hf-wt-group").style.display=isWt?"block":"none";
   document.getElementById("hf-name-group").style.display=isWt?"none":"block";
-  if(isWt){document.getElementById("hf-name").value="體重量測";}
+  if(isWt)document.getElementById("hf-name").value="體重量測";
+}
+function pickEditHealthType(el){
+  document.querySelectorAll("#m-editHealth .health-type-btn").forEach(function(b){b.classList.remove("on");});
+  el.classList.add("on");
+  document.getElementById("eh-type").value=el.getAttribute("data-v");
 }
 function saveHealth(){
   var type=document.getElementById("hf-type").value;
@@ -1063,7 +1066,8 @@ function delMedPre(i){mPre.splice(i,1);saveDB();renderMedPresetList();}
 function savePoop(){
   var shape=(document.querySelector(".poop-opt.on")||{dataset:{v:"正常"}}).dataset.v;
   var color=(document.querySelector(".color-dot.on")||{dataset:{v:"棕色"}}).dataset.v;
-  poop.unshift({shape:shape,color:color,time:document.getElementById("pf-time").value,note:document.getElementById("pf-note").value,date:todayStr()});
+  var date=getDP("pf-date-pick")||todayStr();
+  poop.unshift({shape:shape,color:color,time:document.getElementById("pf-time").value,note:document.getElementById("pf-note").value,date:date});
   closeModal("m-poop");saveDB();renderAll();
 }
 
@@ -1257,7 +1261,7 @@ function renderHealth(){
   if(!harr.length){hl.appendChild(emptyEl("🏥","點右上角 + 新增"));return;}
   appendDateGroup(hl,harr,function(l,idx){
     var origIdx=health.indexOf(l);idx=origIdx>=0?origIdx:idx;
-    return makeLcWrap(HI[l.type]||"📋","#fceee8",l.name||l.type,l.type+(l.note?" · "+l.note:""),fmtD(l.date)+(l.time?" "+l.time:""),"del('health',"+idx+")",null);
+    return makeLcWrap(HI[l.type]||"📋","#fceee8",l.name||l.type,l.type+(l.note?" · "+l.note:""),fmtD(l.date)+(l.time?" "+l.time:""),"del('health',"+idx+")","openEditHealth("+idx+")");
   });
 }
 
@@ -1471,6 +1475,35 @@ function importData(){
 }
 
 // ── Preset edit functions ────────────────────────────────────────────────────
+
+var editHealthIdx=-1;
+function openEditHealth(idx){
+  editHealthIdx=idx;
+  var l=health[idx];
+  document.getElementById("eh-type").value=l.type||"症狀";
+  document.getElementById("eh-name").value=l.name||"";
+  document.getElementById("eh-note").value=l.note||"";
+  document.querySelectorAll("#m-editHealth .health-type-btn").forEach(function(b){
+    b.classList.toggle("on",b.getAttribute("data-v")===(l.type||"症狀"));
+  });
+  makeDatePick("eh-date-pick",l.date||todayStr());
+  makeDatePick("eh-next-pick",l.next||"");
+  document.getElementById("m-editHealth").classList.add("open");
+}
+function saveEditHealth(){
+  if(editHealthIdx<0)return;
+  var type=document.getElementById("eh-type").value;
+  health[editHealthIdx]={
+    type:type,
+    name:document.getElementById("eh-name").value||type,
+    date:getDP("eh-date-pick")||todayStr(),
+    next:getDP("eh-next-pick"),
+    note:document.getElementById("eh-note").value
+  };
+  editHealthIdx=-1;
+  closeModal("m-editHealth");
+  saveDB();renderAll();
+}
 var editFoodPreIdx=-1, editMedPreIdx=-1, editSuppPreIdx=-1;
 
 function openEditFoodPre(i){
@@ -1554,10 +1587,38 @@ renderAll();
 
 
 
+
+reIdx]={
+    name:document.getElementById("esp-name").value,
+    dose:document.getElementById("esp-dose").value,
+    type:document.getElementById("esp-type").value,
+    brand:document.getElementById("esp-brand").value
+  };
+  editSuppPreIdx=-1;
+  closeModal("m-editSuppPre");
+  saveDB();renderSuppPresetList();renderSupp();
+}
+function renderAll(){
+  renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
+  if(currentTab===6)renderStats();
+}
+// 頁面載入時：先檢查是否跨日，再從紀錄同步打卡狀態
+checkDailyReset();
+// 跨日清空後才從 localStorage 讀取，確保不會載入昨天的打卡狀態
+medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")||"{}");}catch(e){return{};}}());
+syncCheckinFromLogs();
+renderAll();
+
+
+
+
+
+
+
+
 </script>
 
 <!-- Edit Food Preset -->
-
 <div class="modal-bg" id="m-editFoodPre" onclick="bgClose(event,'m-editFoodPre')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用食物</div>
   <div class="f-group"><label class="f-label">品牌 / 名稱</label><input class="f-input" id="efp-name"></div>
@@ -1569,7 +1630,6 @@ renderAll();
 </div></div>
 
 <!-- Edit Med Preset -->
-
 <div class="modal-bg" id="m-editMedPre" onclick="bgClose(event,'m-editMedPre')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用藥品</div>
   <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="emp-name"></div>
@@ -1582,7 +1642,6 @@ renderAll();
 </div></div>
 
 <!-- Edit Supp Preset -->
-
 <div class="modal-bg" id="m-editSuppPre" onclick="bgClose(event,'m-editSuppPre')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用保健品</div>
   <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="esp-name"></div>
@@ -1592,6 +1651,27 @@ renderAll();
   </div>
   <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="esp-brand"></div>
   <button class="pri-btn" style="background:#b07ab8" onclick="saveEditSuppPre()">儲存修改</button>
+</div></div>
+
+<!-- Edit Health Record -->
+<div class="modal-bg" id="m-editHealth" onclick="bgClose(event,'m-editHealth')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯健康紀錄</div>
+  <div class="f-group"><label class="f-label">類型</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+      <div class="health-type-btn on" data-v="症狀" onclick="pickEditHealthType(this)">🩺 症狀觀察</div>
+      <div class="health-type-btn" data-v="體重" onclick="pickEditHealthType(this)">⚖️ 體重量測</div>
+      <div class="health-type-btn" data-v="回診" onclick="pickEditHealthType(this)">🏥 定期回診</div>
+      <div class="health-type-btn" data-v="疫苗" onclick="pickEditHealthType(this)">💉 疫苗接種</div>
+    </div>
+  </div>
+  <input type="hidden" id="eh-type" value="症狀">
+  <div class="f-group"><label class="f-label">名稱 / 說明</label><input class="f-input" id="eh-name"></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="eh-date-pick"></div></div>
+    <div class="f-group"><label class="f-label">下次預定</label><div class="date-pick" id="eh-next-pick"></div></div>
+  </div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="eh-note"></textarea></div>
+  <button class="pri-btn" style="background:#7a9e87" onclick="saveEditHealth()">儲存修改</button>
 </div></div>
 </body>
 </html>
