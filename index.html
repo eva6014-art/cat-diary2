@@ -524,6 +524,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 
 
+
 var KEY="nekoDiary_v5";
 var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","護肝":"🫀","護腎":"🫘","其他":"🌿"};
 var VSTAT={done:{label:"已完成",color:"#7a9e87",bg:"#e8f0ea"},upcoming:{label:"即將到期",color:"#e07e6a",bg:"#fceee8"},due:{label:"建議預約",color:"#d97706",bg:"#fef3c7"}};
@@ -569,7 +570,7 @@ var confirmDelTarget=null;
 var editFoodIdx=-1;
 var editMedIdx=-1;
 var currentTab=0;
-var medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")||"{}");}catch(e){return{};}}());
+var medCheckin={};// initialized after checkDailyReset
 
 
 
@@ -1541,8 +1542,11 @@ function renderAll(){
 }
 // 頁面載入時：先檢查是否跨日，再從紀錄同步打卡狀態
 checkDailyReset();
+// 跨日清空後才從 localStorage 讀取，確保不會載入昨天的打卡狀態
+medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")||"{}");}catch(e){return{};}}());
 syncCheckinFromLogs();
 renderAll();
+
 
 
 
