@@ -507,14 +507,16 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯用藥紀錄</div>
   <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="em-name"></div>
   <div class="two-col">
-    <div class="
+    <div class="two-col">
+    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="em-dose"></div>
+    <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="em-time" type="time"></div>
+  </div>
+  <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="em-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="em-note"></textarea></div>
+  <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMed()">儲存修改</button>
+</div></div>
 
-
-
-
-
-
-
+<script>
 
 var KEY="nekoDiary_v5";
 var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","護肝":"🫀","護腎":"🫘","其他":"🌿"};
@@ -1588,16 +1590,6 @@ renderAll();
 
 
 
-reIdx]={
-    name:document.getElementById("esp-name").value,
-    dose:document.getElementById("esp-dose").value,
-    type:document.getElementById("esp-type").value,
-    brand:document.getElementById("esp-brand").value
-  };
-  editSuppPreIdx=-1;
-  closeModal("m-editSuppPre");
-  saveDB();renderSuppPresetList();renderSupp();
-}
 function renderAll(){
   renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
   if(currentTab===6)renderStats();
@@ -1608,6 +1600,7 @@ checkDailyReset();
 medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")||"{}");}catch(e){return{};}}());
 syncCheckinFromLogs();
 renderAll();
+
 
 
 
