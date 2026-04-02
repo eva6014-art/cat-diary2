@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -178,11 +179,13 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 .health-type-btn{padding:10px 8px;border:1.5px solid #e4dfd8;border-radius:10px;font-size:13px;text-align:center;cursor:pointer;background:#f5f2ee;color:#7a766f;transition:all .15s}
 .health-type-btn.on{border-color:#7a9e87;background:#e8f0ea;color:#7a9e87;font-weight:500}
 </style>
+
 </head>
 <body>
 <div class="app">
 
 <!-- HEADER -->
+
 <div class="hdr">
   <div class="hdr-top">
     <div class="pet-row" onclick="openModal('pet')">
@@ -212,9 +215,11 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- CONTENT -->
+
 <div class="content">
 
 <!-- HOME -->
+
 <div class="sec on" id="sec-0">
   <div id="reminders"></div>
   <div class="today-note"><span>✨</span><span id="homeNote">今天是美好的一天！</span></div>
@@ -238,6 +243,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- FOOD -->
+
 <div class="sec" id="sec-1">
   <div class="sec-hdr">
     <div class="sec-title">飲食紀錄</div>
@@ -251,6 +257,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- HEALTH -->
+
 <div class="sec" id="sec-2">
   <div class="sec-hdr">
     <div class="sec-title">健康紀錄</div>
@@ -261,6 +268,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- MED -->
+
 <div class="sec" id="sec-3">
   <div class="sec-hdr">
     <div class="sec-title">用藥紀錄</div>
@@ -278,6 +286,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- POOP -->
+
 <div class="sec" id="sec-4">
   <div class="sec-hdr">
     <div class="sec-title">排便紀錄</div>
@@ -292,6 +301,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- SUPP -->
+
 <div class="sec" id="sec-5">
   <div class="sec-hdr">
     <div class="sec-title">保健食品</div>
@@ -308,6 +318,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- STATS -->
+
 <div class="sec" id="sec-6">
   <div class="period-row">
     <button class="period-btn on" onclick="setPeriod(7,this)">本週</button>
@@ -320,6 +331,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div><!-- /content -->
 
 <!-- BOTTOM NAV -->
+
 <div class="bnav">
   <button class="nav-btn on" onclick="goNav(0,this)"><span class="nav-icon">🏠</span><span class="nav-lbl">總覽</span></button>
   <button class="nav-btn" onclick="goNav(1,this)"><span class="nav-icon">🍖</span><span class="nav-lbl">飲食</span></button>
@@ -332,6 +344,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div><!-- /app -->
 
 <!-- MODALS -->
+
 <div class="modal-bg" id="m-pet" onclick="bgClose(event,'m-pet')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯寵物資料</div>
   <div class="f-group"><label class="f-label">名字</label><input class="f-input" id="pef-name" placeholder="小橘"></div>
@@ -514,6 +527,66 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
   <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="em-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
   <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="em-note"></textarea></div>
   <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMed()">儲存修改</button>
+</div></div>
+
+<!-- Edit Food Preset -->
+
+<div class="modal-bg" id="m-editFoodPre" onclick="bgClose(event,'m-editFoodPre')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用食物</div>
+  <div class="f-group"><label class="f-label">品牌 / 名稱</label><input class="f-input" id="efp-name"></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">種類</label><select class="f-select" id="efp-type"><option>主食罐</option><option>副食罐</option><option>乾食</option><option>零食</option><option>水</option></select></div>
+    <div class="f-group"><label class="f-label">慣用份量(g)</label><input class="f-input" id="efp-amount" type="number"></div>
+  </div>
+  <button class="pri-btn" style="background:#d4a853" onclick="saveEditFoodPre()">儲存修改</button>
+</div></div>
+
+<!-- Edit Med Preset -->
+
+<div class="modal-bg" id="m-editMedPre" onclick="bgClose(event,'m-editMedPre')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用藥品</div>
+  <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="emp-name"></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="emp-dose"></div>
+    <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="emp-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
+  </div>
+  <div class="f-group"><label class="f-label">備註</label><input class="f-input" id="emp-note"></div>
+  <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMedPre()">儲存修改</button>
+</div></div>
+
+<!-- Edit Supp Preset -->
+
+<div class="modal-bg" id="m-editSuppPre" onclick="bgClose(event,'m-editSuppPre')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用保健品</div>
+  <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="esp-name"></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="esp-dose"></div>
+    <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="esp-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
+  </div>
+  <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="esp-brand"></div>
+  <button class="pri-btn" style="background:#b07ab8" onclick="saveEditSuppPre()">儲存修改</button>
+</div></div>
+
+<!-- Edit Health Record -->
+
+<div class="modal-bg" id="m-editHealth" onclick="bgClose(event,'m-editHealth')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯健康紀錄</div>
+  <div class="f-group"><label class="f-label">類型</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+      <div class="health-type-btn on" data-v="症狀" onclick="pickEditHealthType(this)">🩺 症狀觀察</div>
+      <div class="health-type-btn" data-v="體重" onclick="pickEditHealthType(this)">⚖️ 體重量測</div>
+      <div class="health-type-btn" data-v="回診" onclick="pickEditHealthType(this)">🏥 定期回診</div>
+      <div class="health-type-btn" data-v="疫苗" onclick="pickEditHealthType(this)">💉 疫苗接種</div>
+    </div>
+  </div>
+  <input type="hidden" id="eh-type" value="症狀">
+  <div class="f-group"><label class="f-label">名稱 / 說明</label><input class="f-input" id="eh-name"></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="eh-date-pick"></div></div>
+    <div class="f-group"><label class="f-label">下次預定</label><div class="date-pick" id="eh-next-pick"></div></div>
+  </div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="eh-note"></textarea></div>
+  <button class="pri-btn" style="background:#7a9e87" onclick="saveEditHealth()">儲存修改</button>
 </div></div>
 
 <script>
@@ -1611,60 +1684,5 @@ renderAll();
 
 </script>
 
-<!-- Edit Food Preset -->
-<div class="modal-bg" id="m-editFoodPre" onclick="bgClose(event,'m-editFoodPre')"><div class="modal">
-  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用食物</div>
-  <div class="f-group"><label class="f-label">品牌 / 名稱</label><input class="f-input" id="efp-name"></div>
-  <div class="two-col">
-    <div class="f-group"><label class="f-label">種類</label><select class="f-select" id="efp-type"><option>主食罐</option><option>副食罐</option><option>乾食</option><option>零食</option><option>水</option></select></div>
-    <div class="f-group"><label class="f-label">慣用份量(g)</label><input class="f-input" id="efp-amount" type="number"></div>
-  </div>
-  <button class="pri-btn" style="background:#d4a853" onclick="saveEditFoodPre()">儲存修改</button>
-</div></div>
-
-<!-- Edit Med Preset -->
-<div class="modal-bg" id="m-editMedPre" onclick="bgClose(event,'m-editMedPre')"><div class="modal">
-  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用藥品</div>
-  <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="emp-name"></div>
-  <div class="two-col">
-    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="emp-dose"></div>
-    <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="emp-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
-  </div>
-  <div class="f-group"><label class="f-label">備註</label><input class="f-input" id="emp-note"></div>
-  <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMedPre()">儲存修改</button>
-</div></div>
-
-<!-- Edit Supp Preset -->
-<div class="modal-bg" id="m-editSuppPre" onclick="bgClose(event,'m-editSuppPre')"><div class="modal">
-  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用保健品</div>
-  <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="esp-name"></div>
-  <div class="two-col">
-    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="esp-dose"></div>
-    <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="esp-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
-  </div>
-  <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="esp-brand"></div>
-  <button class="pri-btn" style="background:#b07ab8" onclick="saveEditSuppPre()">儲存修改</button>
-</div></div>
-
-<!-- Edit Health Record -->
-<div class="modal-bg" id="m-editHealth" onclick="bgClose(event,'m-editHealth')"><div class="modal">
-  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯健康紀錄</div>
-  <div class="f-group"><label class="f-label">類型</label>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
-      <div class="health-type-btn on" data-v="症狀" onclick="pickEditHealthType(this)">🩺 症狀觀察</div>
-      <div class="health-type-btn" data-v="體重" onclick="pickEditHealthType(this)">⚖️ 體重量測</div>
-      <div class="health-type-btn" data-v="回診" onclick="pickEditHealthType(this)">🏥 定期回診</div>
-      <div class="health-type-btn" data-v="疫苗" onclick="pickEditHealthType(this)">💉 疫苗接種</div>
-    </div>
-  </div>
-  <input type="hidden" id="eh-type" value="症狀">
-  <div class="f-group"><label class="f-label">名稱 / 說明</label><input class="f-input" id="eh-name"></div>
-  <div class="two-col">
-    <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="eh-date-pick"></div></div>
-    <div class="f-group"><label class="f-label">下次預定</label><div class="date-pick" id="eh-next-pick"></div></div>
-  </div>
-  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="eh-note"></textarea></div>
-  <button class="pri-btn" style="background:#7a9e87" onclick="saveEditHealth()">儲存修改</button>
-</div></div>
 </body>
 </html>
