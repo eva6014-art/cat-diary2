@@ -591,6 +591,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 <script>
 
+
 var KEY="nekoDiary_v5";
 var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","護肝":"🫀","護腎":"🫘","其他":"🌿"};
 var VSTAT={done:{label:"已完成",color:"#7a9e87",bg:"#e8f0ea"},upcoming:{label:"即將到期",color:"#e07e6a",bg:"#fceee8"},due:{label:"建議預約",color:"#d97706",bg:"#fef3c7"}};
@@ -1040,12 +1041,12 @@ function renderFoodPresetList(){
     card.innerHTML="<div class='pre-icon' style='background:#faf3e0'>🍽️</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.type)+(p.amount?" · "+p.amount+"g":"")+"</div></div>";
     var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
     var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#faf3e0;color:#d4a853";ub.textContent="使用";ub.onclick=function(){useFoodPreFromList(i);};
-    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.onclick=(function(i){return function(){closeModal("m-foodPreset");setTimeout(function(){openEditFoodPre(i);},200);};})(i);
+    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.onclick=(function(i){return function(){closeModal("m-foodPreset");openEditFoodPre(i);};})(i);
     var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.onclick=function(){delFoodPre(i);};
     acts.appendChild(ub);acts.appendChild(eb);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
   });
 }
-function useFoodPreFromList(i){var p=fPre[i];closeModal("m-foodPreset");setTimeout(function(){openModal("food");useFoodPre(i);},200);}
+function useFoodPreFromList(i){var p=fPre[i];closeModal("m-foodPreset");openModal("food");useFoodPre(i);}
 function delFoodPre(i){fPre.splice(i,1);saveDB();renderFoodPresetList();}
 
 function pickHealthType(el){
@@ -1130,12 +1131,12 @@ function renderMedPresetList(){
     card.innerHTML="<div class='pre-icon' style='background:#eef0fa'>💊</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.dose)+" · "+esc(p.method)+(p.note?" · "+esc(p.note):"")+"</div></div>";
     var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
     var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#eef0fa;color:#7b8ec8";ub.textContent="使用";ub.onclick=function(){useMedPreFromList(i);};
-    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.onclick=(function(i){return function(){closeModal("m-medPreset");setTimeout(function(){openEditMedPre(i);},200);};})(i);
+    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.onclick=(function(i){return function(){closeModal("m-medPreset");openEditMedPre(i);};})(i);
     var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.onclick=function(){delMedPre(i);};
     acts.appendChild(ub);acts.appendChild(eb);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
   });
 }
-function useMedPreFromList(i){closeModal("m-medPreset");setTimeout(function(){openModal("med");useMedPre(i);},200);}
+function useMedPreFromList(i){closeModal("m-medPreset");openModal("med");useMedPre(i);}
 function delMedPre(i){mPre.splice(i,1);saveDB();renderMedPresetList();}
 
 function savePoop(){
@@ -1246,12 +1247,12 @@ function renderSuppPresetList(){
     card.innerHTML="<div class='pre-icon' style='background:#f5edf8'>"+(SICONS[p.type]||"🌿")+"</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.dose)+" · "+esc(p.type)+(p.brand?" · "+esc(p.brand):"")+"</div></div>";
     var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
     var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#f5edf8;color:#b07ab8";ub.textContent="使用";ub.onclick=function(){useSuppPreFromList(i);};
-    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.onclick=(function(i){return function(){closeModal("m-suppPreset");setTimeout(function(){openEditSuppPre(i);},200);};})(i);
+    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.onclick=(function(i){return function(){closeModal("m-suppPreset");openEditSuppPre(i);};})(i);
     var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.onclick=function(){delSuppPre(i);};
     acts.appendChild(ub);acts.appendChild(eb);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
   });
 }
-function useSuppPreFromList(i){closeModal("m-suppPreset");setTimeout(function(){openModal("supp");useSuppPre(i);},200);}
+function useSuppPreFromList(i){closeModal("m-suppPreset");openModal("supp");useSuppPre(i);}
 function delSuppPre(i){sPre.splice(i,1);saveDB();renderSuppPresetList();}
 
 function parseWt(l){var src=(l.name||"")+" "+(l.note||"");var m=src.match(/[0-9]+\.?[0-9]*/);return m?parseFloat(m[0]):0;}
@@ -1673,6 +1674,7 @@ checkDailyReset();
 medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")||"{}");}catch(e){return{};}}());
 syncCheckinFromLogs();
 renderAll();
+
 
 
 
