@@ -577,7 +577,22 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 
 
+
+
+
+//
+
+
+
+
+
+
 // ── Global preset edit helpers ────────────────────────────────────────────
+function closeAllModals(){
+  document.querySelectorAll(".modal-bg").forEach(function(m){
+    m.classList.remove("open");
+  });
+}
 function editFoodPreBtn(i){ closeModal("m-foodPreset"); openEditFoodPre(i); }
 function editMedPreBtn(i){ closeModal("m-medPreset"); openEditMedPre(i); }
 function editSuppPreBtn(i){ closeModal("m-suppPreset"); openEditSuppPre(i); }
@@ -1660,28 +1675,6 @@ function saveEditSuppPre(){
   saveDB();renderSuppPresetList();renderSupp();
 }
 
-// ── 事件委派：處理所有 preset 按鈕 ─────────────────────────────────────────
-document.addEventListener("click", function(e){
-  var btn = e.target;
-  // 往上找有 data-action 的元素
-  while(btn && btn !== document && !btn.getAttribute("data-action")){
-    btn = btn.parentNode;
-  }
-  if(!btn || !btn.getAttribute)return;
-  var action = btn.getAttribute("data-action");
-  if(!action)return;
-  var idx = parseInt(btn.getAttribute("data-idx"), 10);
-  e.stopPropagation();
-  if(action==="use-food"){ useFoodPreFromList(idx); }
-  else if(action==="edit-food"){ closeModal("m-foodPreset"); openEditFoodPre(idx); }
-  else if(action==="del-food"){ delFoodPre(idx); }
-  else if(action==="use-med"){ useMedPreFromList(idx); }
-  else if(action==="edit-med"){ closeModal("m-medPreset"); openEditMedPre(idx); }
-  else if(action==="del-med"){ delMedPre(idx); }
-  else if(action==="use-supp"){ useSuppPreFromList(idx); }
-  else if(action==="edit-supp"){ closeModal("m-suppPreset"); openEditSuppPre(idx); }
-  else if(action==="del-supp"){ delSuppPre(idx); }
-});
 function renderAll(){
   renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
   if(currentTab===6)renderStats();
@@ -1693,19 +1686,9 @@ medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")|
 syncCheckinFromLogs();
 renderAll();
 
-
-
-
-
-
-
-
-
-
 // ── 事件委派：處理所有 preset 按鈕 ─────────────────────────────────────────
 document.addEventListener("click", function(e){
   var btn = e.target;
-  // 往上找有 data-action 的元素
   while(btn && btn !== document && !btn.getAttribute("data-action")){
     btn = btn.parentNode;
   }
@@ -1714,16 +1697,18 @@ document.addEventListener("click", function(e){
   if(!action)return;
   var idx = parseInt(btn.getAttribute("data-idx"), 10);
   e.stopPropagation();
-  if(action==="use-food"){ useFoodPreFromList(idx); }
-  else if(action==="edit-food"){ closeModal("m-foodPreset"); openEditFoodPre(idx); }
+  e.preventDefault();
+  if(action==="use-food"){ closeAllModals(); useFoodPreFromList(idx); }
+  else if(action==="edit-food"){ closeAllModals(); openEditFoodPre(idx); }
   else if(action==="del-food"){ delFoodPre(idx); }
-  else if(action==="use-med"){ useMedPreFromList(idx); }
-  else if(action==="edit-med"){ closeModal("m-medPreset"); openEditMedPre(idx); }
+  else if(action==="use-med"){ closeAllModals(); useMedPreFromList(idx); }
+  else if(action==="edit-med"){ closeAllModals(); openEditMedPre(idx); }
   else if(action==="del-med"){ delMedPre(idx); }
-  else if(action==="use-supp"){ useSuppPreFromList(idx); }
-  else if(action==="edit-supp"){ closeModal("m-suppPreset"); openEditSuppPre(idx); }
+  else if(action==="use-supp"){ closeAllModals(); useSuppPreFromList(idx); }
+  else if(action==="edit-supp"){ closeAllModals(); openEditSuppPre(idx); }
   else if(action==="del-supp"){ delSuppPre(idx); }
 });
+
 function renderAll(){
   renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
   if(currentTab===6)renderStats();
@@ -1735,9 +1720,7 @@ medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")|
 syncCheckinFromLogs();
 renderAll();
 
-
-
-
+// ── 事件委派：處理所有 preset 按鈕 ─────────────────────────────────────────
 
 
 
