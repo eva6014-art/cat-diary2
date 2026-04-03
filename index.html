@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -179,13 +178,11 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 .health-type-btn{padding:10px 8px;border:1.5px solid #e4dfd8;border-radius:10px;font-size:13px;text-align:center;cursor:pointer;background:#f5f2ee;color:#7a766f;transition:all .15s}
 .health-type-btn.on{border-color:#7a9e87;background:#e8f0ea;color:#7a9e87;font-weight:500}
 </style>
-
 </head>
 <body>
 <div class="app">
 
 <!-- HEADER -->
-
 <div class="hdr">
   <div class="hdr-top">
     <div class="pet-row" onclick="openModal('pet')">
@@ -215,11 +212,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- CONTENT -->
-
 <div class="content">
 
 <!-- HOME -->
-
 <div class="sec on" id="sec-0">
   <div id="reminders"></div>
   <div class="today-note"><span>✨</span><span id="homeNote">今天是美好的一天！</span></div>
@@ -243,7 +238,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- FOOD -->
-
 <div class="sec" id="sec-1">
   <div class="sec-hdr">
     <div class="sec-title">飲食紀錄</div>
@@ -257,7 +251,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- HEALTH -->
-
 <div class="sec" id="sec-2">
   <div class="sec-hdr">
     <div class="sec-title">健康紀錄</div>
@@ -268,7 +261,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- MED -->
-
 <div class="sec" id="sec-3">
   <div class="sec-hdr">
     <div class="sec-title">用藥紀錄</div>
@@ -286,7 +278,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- POOP -->
-
 <div class="sec" id="sec-4">
   <div class="sec-hdr">
     <div class="sec-title">排便紀錄</div>
@@ -301,7 +292,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- SUPP -->
-
 <div class="sec" id="sec-5">
   <div class="sec-hdr">
     <div class="sec-title">保健食品</div>
@@ -318,7 +308,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- STATS -->
-
 <div class="sec" id="sec-6">
   <div class="period-row">
     <button class="period-btn on" onclick="setPeriod(7,this)">本週</button>
@@ -331,7 +320,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div><!-- /content -->
 
 <!-- BOTTOM NAV -->
-
 <div class="bnav">
   <button class="nav-btn on" onclick="goNav(0,this)"><span class="nav-icon">🏠</span><span class="nav-lbl">總覽</span></button>
   <button class="nav-btn" onclick="goNav(1,this)"><span class="nav-icon">🍖</span><span class="nav-lbl">飲食</span></button>
@@ -344,7 +332,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div><!-- /app -->
 
 <!-- MODALS -->
-
 <div class="modal-bg" id="m-pet" onclick="bgClose(event,'m-pet')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯寵物資料</div>
   <div class="f-group"><label class="f-label">名字</label><input class="f-input" id="pef-name" placeholder="小橘"></div>
@@ -529,8 +516,8 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
   <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMed()">儲存修改</button>
 </div></div>
 
-<!-- Edit Food Preset -->
 
+<!-- Edit Food Preset -->
 <div class="modal-bg" id="m-editFoodPre" onclick="bgClose(event,'m-editFoodPre')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用食物</div>
   <div class="f-group"><label class="f-label">品牌 / 名稱</label><input class="f-input" id="efp-name"></div>
@@ -542,7 +529,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div></div>
 
 <!-- Edit Med Preset -->
-
 <div class="modal-bg" id="m-editMedPre" onclick="bgClose(event,'m-editMedPre')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用藥品</div>
   <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="emp-name"></div>
@@ -555,7 +541,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div></div>
 
 <!-- Edit Supp Preset -->
-
 <div class="modal-bg" id="m-editSuppPre" onclick="bgClose(event,'m-editSuppPre')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用保健品</div>
   <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="esp-name"></div>
@@ -568,7 +553,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div></div>
 
 <!-- Edit Health Record -->
-
 <div class="modal-bg" id="m-editHealth" onclick="bgClose(event,'m-editHealth')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯健康紀錄</div>
   <div class="f-group"><label class="f-label">類型</label>
@@ -590,6 +574,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div></div>
 
 <script>
+
 
 
 // ── Global preset edit helpers ────────────────────────────────────────────
@@ -1058,9 +1043,9 @@ function renderFoodPresetList(){
       +'<div style="flex:1;min-width:0"><div class="pre-name">'+esc(p.name)+'</div>'
       +'<div class="pre-detail">'+esc(p.type)+(p.amount?' · '+p.amount+'g':'')+'</div></div>'
       +'<div style="display:flex;gap:5px">'
-      +'<button class="pre-use" style="background:#faf3e0;color:#d4a853" onclick="useFoodBtn('+i+')">使用</button>'
-      +'<button class="pre-use" style="background:#f0ede8;color:#7a766f" onclick="editFoodPreBtn('+i+')">✏️</button>'
-      +'<button class="pre-del" onclick="delFoodBtn('+i+')">✕</button>'
+      +'<button class="pre-use" style="background:#faf3e0;color:#d4a853" data-action="use-food" data-idx="'+i+'">使用</button>'
+      +'<button class="pre-use" style="background:#f0ede8;color:#7a766f" data-action="edit-food" data-idx="'+i+'">✏️</button>'
+      +'<button class="pre-del" data-action="del-food" data-idx="'+i+'">✕</button>'
       +'</div></div>';
   }
   el.innerHTML=h;
@@ -1153,9 +1138,9 @@ function renderMedPresetList(){
       +'<div style="flex:1;min-width:0"><div class="pre-name">'+esc(p.name)+'</div>'
       +'<div class="pre-detail">'+esc(p.dose||'')+' · '+esc(p.method||'')+(p.note?' · '+esc(p.note):'')+'</div></div>'
       +'<div style="display:flex;gap:5px">'
-      +'<button class="pre-use" style="background:#eef0fa;color:#7b8ec8" onclick="useMedBtn('+i+')">使用</button>'
-      +'<button class="pre-use" style="background:#f0ede8;color:#7a766f" onclick="editMedPreBtn('+i+')">✏️</button>'
-      +'<button class="pre-del" onclick="delMedBtn('+i+')">✕</button>'
+      +'<button class="pre-use" style="background:#eef0fa;color:#7b8ec8" data-action="use-med" data-idx="'+i+'">使用</button>'
+      +'<button class="pre-use" style="background:#f0ede8;color:#7a766f" data-action="edit-med" data-idx="'+i+'">✏️</button>'
+      +'<button class="pre-del" data-action="del-med" data-idx="'+i+'">✕</button>'
       +'</div></div>';
   }
   el.innerHTML=h;
@@ -1274,9 +1259,9 @@ function renderSuppPresetList(){
       +'<div style="flex:1;min-width:0"><div class="pre-name">'+esc(p.name)+'</div>'
       +'<div class="pre-detail">'+esc(p.dose||'')+' · '+esc(p.type||'')+(p.brand?' · '+esc(p.brand):'')+'</div></div>'
       +'<div style="display:flex;gap:5px">'
-      +'<button class="pre-use" style="background:#f5edf8;color:#b07ab8" onclick="useSuppBtn('+i+')">使用</button>'
-      +'<button class="pre-use" style="background:#f0ede8;color:#7a766f" onclick="editSuppPreBtn('+i+')">✏️</button>'
-      +'<button class="pre-del" onclick="delSuppBtn('+i+')">✕</button>'
+      +'<button class="pre-use" style="background:#f5edf8;color:#b07ab8" data-action="use-supp" data-idx="'+i+'">使用</button>'
+      +'<button class="pre-use" style="background:#f0ede8;color:#7a766f" data-action="edit-supp" data-idx="'+i+'">✏️</button>'
+      +'<button class="pre-del" data-action="del-supp" data-idx="'+i+'">✕</button>'
       +'</div></div>';
   }
   el.innerHTML=h;
@@ -1674,6 +1659,29 @@ function saveEditSuppPre(){
   closeModal("m-editSuppPre");
   saveDB();renderSuppPresetList();renderSupp();
 }
+
+// ── 事件委派：處理所有 preset 按鈕 ─────────────────────────────────────────
+document.addEventListener("click", function(e){
+  var btn = e.target;
+  // 往上找有 data-action 的元素
+  while(btn && btn !== document && !btn.getAttribute("data-action")){
+    btn = btn.parentNode;
+  }
+  if(!btn || !btn.getAttribute)return;
+  var action = btn.getAttribute("data-action");
+  if(!action)return;
+  var idx = parseInt(btn.getAttribute("data-idx"), 10);
+  e.stopPropagation();
+  if(action==="use-food"){ useFoodPreFromList(idx); }
+  else if(action==="edit-food"){ closeModal("m-foodPreset"); openEditFoodPre(idx); }
+  else if(action==="del-food"){ delFoodPre(idx); }
+  else if(action==="use-med"){ useMedPreFromList(idx); }
+  else if(action==="edit-med"){ closeModal("m-medPreset"); openEditMedPre(idx); }
+  else if(action==="del-med"){ delMedPre(idx); }
+  else if(action==="use-supp"){ useSuppPreFromList(idx); }
+  else if(action==="edit-supp"){ closeModal("m-suppPreset"); openEditSuppPre(idx); }
+  else if(action==="del-supp"){ delSuppPre(idx); }
+});
 function renderAll(){
   renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
   if(currentTab===6)renderStats();
@@ -1693,6 +1701,29 @@ renderAll();
 
 
 
+
+// ── 事件委派：處理所有 preset 按鈕 ─────────────────────────────────────────
+document.addEventListener("click", function(e){
+  var btn = e.target;
+  // 往上找有 data-action 的元素
+  while(btn && btn !== document && !btn.getAttribute("data-action")){
+    btn = btn.parentNode;
+  }
+  if(!btn || !btn.getAttribute)return;
+  var action = btn.getAttribute("data-action");
+  if(!action)return;
+  var idx = parseInt(btn.getAttribute("data-idx"), 10);
+  e.stopPropagation();
+  if(action==="use-food"){ useFoodPreFromList(idx); }
+  else if(action==="edit-food"){ closeModal("m-foodPreset"); openEditFoodPre(idx); }
+  else if(action==="del-food"){ delFoodPre(idx); }
+  else if(action==="use-med"){ useMedPreFromList(idx); }
+  else if(action==="edit-med"){ closeModal("m-medPreset"); openEditMedPre(idx); }
+  else if(action==="del-med"){ delMedPre(idx); }
+  else if(action==="use-supp"){ useSuppPreFromList(idx); }
+  else if(action==="edit-supp"){ closeModal("m-suppPreset"); openEditSuppPre(idx); }
+  else if(action==="del-supp"){ delSuppPre(idx); }
+});
 function renderAll(){
   renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
   if(currentTab===6)renderStats();
@@ -1703,6 +1734,7 @@ checkDailyReset();
 medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")||"{}");}catch(e){return{};}}());
 syncCheckinFromLogs();
 renderAll();
+
 
 
 
