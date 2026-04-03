@@ -591,6 +591,18 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 <script>
 
+// ── Global preset edit helpers ────────────────────────────────────────────
+function editFoodPreBtn(i){ closeModal("m-foodPreset"); openEditFoodPre(i); }
+function editMedPreBtn(i){ closeModal("m-medPreset"); openEditMedPre(i); }
+function editSuppPreBtn(i){ closeModal("m-suppPreset"); openEditSuppPre(i); }
+function useFoodBtn(i){ useFoodPreFromList(i); }
+function useMedBtn(i){ useMedPreFromList(i); }
+function useSuppBtn(i){ useSuppPreFromList(i); }
+function delFoodBtn(i){ delFoodPre(i); }
+function delMedBtn(i){ delMedPre(i); }
+function delSuppBtn(i){ delSuppPre(i); }
+
+
 
 
 var KEY="nekoDiary_v5";
@@ -1041,9 +1053,9 @@ function renderFoodPresetList(){
     var card=document.createElement("div");card.className="pre-card";
     card.innerHTML="<div class='pre-icon' style='background:#faf3e0'>🍽️</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.type)+(p.amount?" · "+p.amount+"g":"")+"</div></div>";
     var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
-    var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#faf3e0;color:#d4a853";ub.textContent="使用";ub.setAttribute("onclick","useFoodPreFromList("+i+")");
-    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.setAttribute("onclick","closeModal('m-foodPreset');openEditFoodPre("+i+")");
-    var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.setAttribute("onclick","delFoodPre("+i+")");
+    var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#faf3e0;color:#d4a853";ub.textContent="使用";ub.setAttribute("data-idx",i);ub.setAttribute("onclick","useFoodBtn("+i+")");
+    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.setAttribute("data-idx",i);eb.setAttribute("onclick","editFoodPreBtn("+i+")");
+    var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.setAttribute("data-idx",i);db.setAttribute("onclick","delFoodBtn("+i+")");
     acts.appendChild(ub);acts.appendChild(eb);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
   });
 }
@@ -1131,9 +1143,9 @@ function renderMedPresetList(){
     var card=document.createElement("div");card.className="pre-card";
     card.innerHTML="<div class='pre-icon' style='background:#eef0fa'>💊</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.dose)+" · "+esc(p.method)+(p.note?" · "+esc(p.note):"")+"</div></div>";
     var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
-    var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#eef0fa;color:#7b8ec8";ub.textContent="使用";ub.setAttribute("onclick","useMedPreFromList("+i+")");
-    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.setAttribute("onclick","closeModal('m-medPreset');openEditMedPre("+i+")");
-    var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.setAttribute("onclick","delMedPre("+i+")");
+    var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#eef0fa;color:#7b8ec8";ub.textContent="使用";ub.setAttribute("data-idx",i);ub.setAttribute("onclick","useMedBtn("+i+")");
+    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.setAttribute("data-idx",i);eb.setAttribute("onclick","editMedPreBtn("+i+")");
+    var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.setAttribute("data-idx",i);db.setAttribute("onclick","delMedBtn("+i+")");
     acts.appendChild(ub);acts.appendChild(eb);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
   });
 }
@@ -1247,9 +1259,9 @@ function renderSuppPresetList(){
     var card=document.createElement("div");card.className="pre-card";
     card.innerHTML="<div class='pre-icon' style='background:#f5edf8'>"+(SICONS[p.type]||"🌿")+"</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.dose)+" · "+esc(p.type)+(p.brand?" · "+esc(p.brand):"")+"</div></div>";
     var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
-    var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#f5edf8;color:#b07ab8";ub.textContent="使用";ub.setAttribute("onclick","useSuppPreFromList("+i+")");
-    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.setAttribute("onclick","closeModal('m-suppPreset');openEditSuppPre("+i+")");
-    var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.setAttribute("onclick","delSuppPre("+i+")");
+    var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#f5edf8;color:#b07ab8";ub.textContent="使用";ub.setAttribute("data-idx",i);ub.setAttribute("onclick","useSuppBtn("+i+")");
+    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.setAttribute("data-idx",i);eb.setAttribute("onclick","editSuppPreBtn("+i+")");
+    var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.setAttribute("data-idx",i);db.setAttribute("onclick","delSuppBtn("+i+")");
     acts.appendChild(ub);acts.appendChild(eb);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
   });
 }
@@ -1675,6 +1687,7 @@ checkDailyReset();
 medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")||"{}");}catch(e){return{};}}());
 syncCheckinFromLogs();
 renderAll();
+
 
 
 
