@@ -591,6 +591,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 <script>
 
+
 // ── Global preset edit helpers ────────────────────────────────────────────
 function editFoodPreBtn(i){ closeModal("m-foodPreset"); openEditFoodPre(i); }
 function editMedPreBtn(i){ closeModal("m-medPreset"); openEditMedPre(i); }
@@ -1047,17 +1048,22 @@ function addFoodPre(){
   saveDB();renderFoodPresetList();
 }
 function renderFoodPresetList(){
-  var el=clearEl("foodPresetList");
-  if(!fPre.length){el.appendChild(emptyEl("🍽️","尚無常用食物"));return;}
-  fPre.forEach(function(p,i){
-    var card=document.createElement("div");card.className="pre-card";
-    card.innerHTML="<div class='pre-icon' style='background:#faf3e0'>🍽️</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.type)+(p.amount?" · "+p.amount+"g":"")+"</div></div>";
-    var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
-    var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#faf3e0;color:#d4a853";ub.textContent="使用";ub.setAttribute("data-idx",i);ub.setAttribute("onclick","useFoodBtn("+i+")");
-    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.setAttribute("data-idx",i);eb.setAttribute("onclick","editFoodPreBtn("+i+")");
-    var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.setAttribute("data-idx",i);db.setAttribute("onclick","delFoodBtn("+i+")");
-    acts.appendChild(ub);acts.appendChild(eb);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
-  });
+  var el=document.getElementById("foodPresetList");
+  if(!fPre.length){el.innerHTML='<div style="text-align:center;padding:24px;color:#b0aa9f"><div style="font-size:34px;margin-bottom:8px">🍽️</div><div style="font-size:12px">尚無常用食物</div></div>';return;}
+  var h='';
+  for(var i=0;i<fPre.length;i++){
+    var p=fPre[i];
+    h+='<div class="pre-card">'
+      +'<div class="pre-icon" style="background:#faf3e0">🍽️</div>'
+      +'<div style="flex:1;min-width:0"><div class="pre-name">'+esc(p.name)+'</div>'
+      +'<div class="pre-detail">'+esc(p.type)+(p.amount?' · '+p.amount+'g':'')+'</div></div>'
+      +'<div style="display:flex;gap:5px">'
+      +'<button class="pre-use" style="background:#faf3e0;color:#d4a853" onclick="useFoodBtn('+i+')">使用</button>'
+      +'<button class="pre-use" style="background:#f0ede8;color:#7a766f" onclick="editFoodPreBtn('+i+')">✏️</button>'
+      +'<button class="pre-del" onclick="delFoodBtn('+i+')">✕</button>'
+      +'</div></div>';
+  }
+  el.innerHTML=h;
 }
 function useFoodPreFromList(i){var p=fPre[i];closeModal("m-foodPreset");openModal("food");useFoodPre(i);}
 function delFoodPre(i){fPre.splice(i,1);saveDB();renderFoodPresetList();}
@@ -1137,17 +1143,22 @@ function addMedPre(){
   saveDB();renderMedPresetList();
 }
 function renderMedPresetList(){
-  var el=clearEl("medPresetList");
-  if(!mPre.length){el.appendChild(emptyEl("💊","尚無常用藥品"));return;}
-  mPre.forEach(function(p,i){
-    var card=document.createElement("div");card.className="pre-card";
-    card.innerHTML="<div class='pre-icon' style='background:#eef0fa'>💊</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.dose)+" · "+esc(p.method)+(p.note?" · "+esc(p.note):"")+"</div></div>";
-    var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
-    var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#eef0fa;color:#7b8ec8";ub.textContent="使用";ub.setAttribute("data-idx",i);ub.setAttribute("onclick","useMedBtn("+i+")");
-    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.setAttribute("data-idx",i);eb.setAttribute("onclick","editMedPreBtn("+i+")");
-    var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.setAttribute("data-idx",i);db.setAttribute("onclick","delMedBtn("+i+")");
-    acts.appendChild(ub);acts.appendChild(eb);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
-  });
+  var el=document.getElementById("medPresetList");
+  if(!mPre.length){el.innerHTML='<div style="text-align:center;padding:24px;color:#b0aa9f"><div style="font-size:34px;margin-bottom:8px">💊</div><div style="font-size:12px">尚無常用藥品</div></div>';return;}
+  var h='';
+  for(var i=0;i<mPre.length;i++){
+    var p=mPre[i];
+    h+='<div class="pre-card">'
+      +'<div class="pre-icon" style="background:#eef0fa">💊</div>'
+      +'<div style="flex:1;min-width:0"><div class="pre-name">'+esc(p.name)+'</div>'
+      +'<div class="pre-detail">'+esc(p.dose||'')+' · '+esc(p.method||'')+(p.note?' · '+esc(p.note):'')+'</div></div>'
+      +'<div style="display:flex;gap:5px">'
+      +'<button class="pre-use" style="background:#eef0fa;color:#7b8ec8" onclick="useMedBtn('+i+')">使用</button>'
+      +'<button class="pre-use" style="background:#f0ede8;color:#7a766f" onclick="editMedPreBtn('+i+')">✏️</button>'
+      +'<button class="pre-del" onclick="delMedBtn('+i+')">✕</button>'
+      +'</div></div>';
+  }
+  el.innerHTML=h;
 }
 function useMedPreFromList(i){closeModal("m-medPreset");openModal("med");useMedPre(i);}
 function delMedPre(i){mPre.splice(i,1);saveDB();renderMedPresetList();}
@@ -1253,17 +1264,22 @@ function addSuppPre(){
   saveDB();renderSuppPresetList();
 }
 function renderSuppPresetList(){
-  var el=clearEl("suppPresetList");
-  if(!sPre.length){el.appendChild(emptyEl("🌿","尚無常用保健品"));return;}
-  sPre.forEach(function(p,i){
-    var card=document.createElement("div");card.className="pre-card";
-    card.innerHTML="<div class='pre-icon' style='background:#f5edf8'>"+(SICONS[p.type]||"🌿")+"</div><div style='flex:1;min-width:0'><div class='pre-name'>"+esc(p.name)+"</div><div class='pre-detail'>"+esc(p.dose)+" · "+esc(p.type)+(p.brand?" · "+esc(p.brand):"")+"</div></div>";
-    var acts=document.createElement("div");acts.style.cssText="display:flex;gap:5px";
-    var ub=document.createElement("button");ub.className="pre-use";ub.style.cssText="background:#f5edf8;color:#b07ab8";ub.textContent="使用";ub.setAttribute("data-idx",i);ub.setAttribute("onclick","useSuppBtn("+i+")");
-    var eb=document.createElement("button");eb.className="pre-use";eb.style.cssText="background:#f0ede8;color:#7a766f";eb.textContent="✏️";eb.setAttribute("data-idx",i);eb.setAttribute("onclick","editSuppPreBtn("+i+")");
-    var db=document.createElement("button");db.className="pre-del";db.textContent="✕";db.setAttribute("data-idx",i);db.setAttribute("onclick","delSuppBtn("+i+")");
-    acts.appendChild(ub);acts.appendChild(eb);acts.appendChild(db);card.appendChild(acts);el.appendChild(card);
-  });
+  var el=document.getElementById("suppPresetList");
+  if(!sPre.length){el.innerHTML='<div style="text-align:center;padding:24px;color:#b0aa9f"><div style="font-size:34px;margin-bottom:8px">🌿</div><div style="font-size:12px">尚無常用保健品</div></div>';return;}
+  var h='';
+  for(var i=0;i<sPre.length;i++){
+    var p=sPre[i];
+    h+='<div class="pre-card">'
+      +'<div class="pre-icon" style="background:#f5edf8">'+(SICONS[p.type]||'🌿')+'</div>'
+      +'<div style="flex:1;min-width:0"><div class="pre-name">'+esc(p.name)+'</div>'
+      +'<div class="pre-detail">'+esc(p.dose||'')+' · '+esc(p.type||'')+(p.brand?' · '+esc(p.brand):'')+'</div></div>'
+      +'<div style="display:flex;gap:5px">'
+      +'<button class="pre-use" style="background:#f5edf8;color:#b07ab8" onclick="useSuppBtn('+i+')">使用</button>'
+      +'<button class="pre-use" style="background:#f0ede8;color:#7a766f" onclick="editSuppPreBtn('+i+')">✏️</button>'
+      +'<button class="pre-del" onclick="delSuppBtn('+i+')">✕</button>'
+      +'</div></div>';
+  }
+  el.innerHTML=h;
 }
 function useSuppPreFromList(i){closeModal("m-suppPreset");openModal("supp");useSuppPre(i);}
 function delSuppPre(i){sPre.splice(i,1);saveDB();renderSuppPresetList();}
@@ -1687,6 +1703,7 @@ checkDailyReset();
 medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")||"{}");}catch(e){return{};}}());
 syncCheckinFromLogs();
 renderAll();
+
 
 
 
