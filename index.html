@@ -574,14 +574,13 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
     <div class="f-group"><label class="f-label">種類</label><select class="f-select" id="efp-type"><option>主食罐</option><option>副食罐</option><option>乾食</option><option>零食</option><option>水</option></select></div>
     <div class="f-group"><label class="f-label">慣用份量(g)</label><input class="f-input" id="efp-amount" type="number"></div>
   </div>
-  <button c
+  <button class="pri-btn" style="background:#d4a853" onclick="saveEditFoodPre()">儲存修改</button>
+</div>
+</div></div>
 
+<div class="toast" id="toast">💾 已自動儲存</div>
 
-
-
-
-
-
+<script>
 //
 
 
@@ -604,13 +603,6 @@ function useSuppBtn(i){ useSuppPreFromList(i); }
 function delFoodBtn(i){ delFoodPre(i); }
 function delMedBtn(i){ delMedPre(i); }
 function delSuppBtn(i){ delSuppPre(i); }
-
-
-
-
-<script>
-
-
 var KEY="nekoDiary_v5";
 var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","護肝":"🫀","護腎":"🫘","其他":"🌿"};
 var VSTAT={done:{label:"已完成",color:"#7a9e87",bg:"#e8f0ea"},upcoming:{label:"即將到期",color:"#e07e6a",bg:"#fceee8"},due:{label:"建議預約",color:"#d97706",bg:"#fef3c7"}};
@@ -1705,8 +1697,8 @@ document.addEventListener("click", function(e){
   else if(action==="edit-supp"){ openEditSuppPre(idx); }
   else if(action==="del-supp"){ delSuppPre(idx); }
 });
-
 </script>
+
 
 </body>
 </html>
