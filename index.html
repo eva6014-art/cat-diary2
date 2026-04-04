@@ -608,6 +608,8 @@ function delSuppBtn(i){ delSuppPre(i); }
 
 
 
+<script>
+
 var KEY="nekoDiary_v5";
 var SICONS={"腸胃保健":"🦠","免疫力":"🛡️","關節保健":"🦴","皮毛保養":"✨","泌尿保健":"💧","眼睛保健":"👁️","護肝":"🫀","護腎":"🫘","其他":"🌿"};
 var VSTAT={done:{label:"已完成",color:"#7a9e87",bg:"#e8f0ea"},upcoming:{label:"即將到期",color:"#e07e6a",bg:"#fceee8"},due:{label:"建議預約",color:"#d97706",bg:"#fef3c7"}};
@@ -1683,27 +1685,6 @@ syncCheckinFromLogs();
 renderAll();
 
 // ── 事件委派：處理所有 preset 按鈕 ─────────────────────────────────────────
-document.addEventListener("click", function(e){
-  var btn = e.target;
-  while(btn && btn !== document && !btn.getAttribute("data-action")){
-    btn = btn.parentNode;
-  }
-  if(!btn || !btn.getAttribute)return;
-  var action = btn.getAttribute("data-action");
-  if(!action)return;
-  var idx = parseInt(btn.getAttribute("data-idx"), 10);
-  e.stopPropagation();
-  e.preventDefault();
-  if(action==="use-food"){ closeAllModals(); useFoodPreFromList(idx); }
-  else if(action==="edit-food"){ closeAllModals(); openEditFoodPre(idx); }
-  else if(action==="del-food"){ delFoodPre(idx); }
-  else if(action==="use-med"){ closeAllModals(); useMedPreFromList(idx); }
-  else if(action==="edit-med"){ closeAllModals(); openEditMedPre(idx); }
-  else if(action==="del-med"){ delMedPre(idx); }
-  else if(action==="use-supp"){ closeAllModals(); useSuppPreFromList(idx); }
-  else if(action==="edit-supp"){ closeAllModals(); openEditSuppPre(idx); }
-  else if(action==="del-supp"){ delSuppPre(idx); }
-});
 
 function renderAll(){
   renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
@@ -1728,46 +1709,6 @@ renderAll();
 
 
 
-=p.name;
-  document.getElementById("emp-dose").value=p.dose||"";
-  document.getElementById("emp-method").value=p.method||"口服";
-  document.getElementById("emp-note").value=p.note||"";
-  document.getElementById("m-editMedPre").classList.add("open");
-}
-function saveEditMedPre(){
-  if(editMedPreIdx<0)return;
-  mPre[editMedPreIdx]={
-    name:document.getElementById("emp-name").value,
-    dose:document.getElementById("emp-dose").value,
-    method:document.getElementById("emp-method").value,
-    note:document.getElementById("emp-note").value
-  };
-  editMedPreIdx=-1;
-  closeModal("m-editMedPre");
-  saveDB();renderMedPresetList();renderMedCheckin();
-}
-
-function openEditSuppPre(i){
-  editSuppPreIdx=i;
-  var p=sPre[i];
-  document.getElementById("esp-name").value=p.name;
-  document.getElementById("esp-dose").value=p.dose||"";
-  document.getElementById("esp-type").value=p.type||"其他";
-  document.getElementById("esp-brand").value=p.brand||"";
-  document.getElementById("m-editSuppPre").classList.add("open");
-}
-function saveEditSuppPre(){
-  if(editSuppPreIdx<0)return;
-  sPre[editSuppPreIdx]={
-    name:document.getElementById("esp-name").value,
-    dose:document.getElementById("esp-dose").value,
-    type:document.getElementById("esp-type").value,
-    brand:document.getElementById("esp-brand").value
-  };
-  editSuppPreIdx=-1;
-  closeModal("m-editSuppPre");
-  saveDB();renderSuppPresetList();renderSupp();
-}
 
 function renderAll(){
   renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
@@ -1793,28 +1734,18 @@ document.addEventListener("click", function(e){
   e.stopPropagation();
   e.preventDefault();
   if(action==="use-food"){ closeAllModals(); useFoodPreFromList(idx); }
-  else if(action==="edit-food"){ closeAllModals(); openEditFoodPre(idx); }
+  else if(action==="edit-food"){ openEditFoodPre(idx); }
   else if(action==="del-food"){ delFoodPre(idx); }
   else if(action==="use-med"){ closeAllModals(); useMedPreFromList(idx); }
-  else if(action==="edit-med"){ closeAllModals(); openEditMedPre(idx); }
+  else if(action==="edit-med"){ openEditMedPre(idx); }
   else if(action==="del-med"){ delMedPre(idx); }
   else if(action==="use-supp"){ closeAllModals(); useSuppPreFromList(idx); }
-  else if(action==="edit-supp"){ closeAllModals(); openEditSuppPre(idx); }
+  else if(action==="edit-supp"){ openEditSuppPre(idx); }
   else if(action==="del-supp"){ delSuppPre(idx); }
 });
 
-function renderAll(){
-  renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
-  if(currentTab===6)renderStats();
-}
-// 頁面載入時：先檢查是否跨日，再從紀錄同步打卡狀態
-checkDailyReset();
-// 跨日清空後才從 localStorage 讀取，確保不會載入昨天的打卡狀態
-medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")||"{}");}catch(e){return{};}}());
-syncCheckinFromLogs();
-renderAll();
-
 // ── 事件委派：處理所有 preset 按鈕 ─────────────────────────────────────────
+
 
 
 
