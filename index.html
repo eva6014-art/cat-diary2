@@ -357,15 +357,32 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div></div>
 
 <div class="modal-bg" id="m-foodPreset" onclick="bgClose(event,'m-foodPreset')"><div class="modal">
-  <div class="modal-handle"></div><div class="modal-title">📋 常用食物清單</div>
-  <div id="foodPresetList"></div>
-  <div style="border-top:1px solid #e4dfd8;padding-top:13px;margin-top:8px">
-    <div class="f-group"><label class="f-label">品牌 / 名稱</label><input class="f-input" id="fpf-name" placeholder="e.g. 皇家雞肉罐"></div>
-    <div class="two-col">
-      <div class="f-group"><label class="f-label">種類</label><select class="f-select" id="fpf-type"><option>主食罐</option><option>副食罐</option><option>乾食</option><option>零食</option><option>水</option></select></div>
-      <div class="f-group"><label class="f-label">慣用份量(g)</label><input class="f-input" id="fpf-amount" type="number" placeholder="80"></div>
+  <div class="modal-handle"></div>
+  <!-- 清單模式 -->
+  <div id="foodPreset-list-view">
+    <div class="modal-title">📋 常用食物清單</div>
+    <div id="foodPresetList"></div>
+    <div style="border-top:1px solid #e4dfd8;padding-top:13px;margin-top:8px">
+      <div class="f-group"><label class="f-label">品牌 / 名稱</label><input class="f-input" id="fpf-name" placeholder="e.g. 皇家雞肉罐"></div>
+      <div class="two-col">
+        <div class="f-group"><label class="f-label">種類</label><select class="f-select" id="fpf-type"><option>主食罐</option><option>副食罐</option><option>乾食</option><option>零食</option><option>水</option></select></div>
+        <div class="f-group"><label class="f-label">慣用份量(g)</label><input class="f-input" id="fpf-amount" type="number" placeholder="80"></div>
+      </div>
+      <button class="pri-btn" style="background:#d4a853" onclick="addFoodPre()">加入清單</button>
     </div>
-    <button class="pri-btn" style="background:#d4a853" onclick="addFoodPre()">加入清單</button>
+  </div>
+  <!-- 編輯模式（內嵌） -->
+  <div id="foodPreset-edit-view" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <button onclick="showFoodPreList()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#7a9e87">←</button>
+      <div class="modal-title" style="margin-bottom:0">✏️ 編輯食物</div>
+    </div>
+    <div class="f-group"><label class="f-label">品牌 / 名稱</label><input class="f-input" id="efp-name"></div>
+    <div class="two-col">
+      <div class="f-group"><label class="f-label">種類</label><select class="f-select" id="efp-type"><option>主食罐</option><option>副食罐</option><option>乾食</option><option>零食</option><option>水</option></select></div>
+      <div class="f-group"><label class="f-label">慣用份量(g)</label><input class="f-input" id="efp-amount" type="number"></div>
+    </div>
+    <button class="pri-btn" style="background:#d4a853" onclick="saveEditFoodPre()">儲存修改</button>
   </div>
 </div></div>
 
@@ -412,16 +429,32 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div></div>
 
 <div class="modal-bg" id="m-medPreset" onclick="bgClose(event,'m-medPreset')"><div class="modal">
-  <div class="modal-handle"></div><div class="modal-title">📋 常用藥品清單</div>
-  <div id="medPresetList"></div>
-  <div style="border-top:1px solid #e4dfd8;padding-top:13px;margin-top:8px">
-    <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="mpf-name" placeholder="抗生素"></div>
-    <div class="two-col">
-      <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="mpf-dose" placeholder="0.5ml"></div>
-      <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="mpf-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
+  <div class="modal-handle"></div>
+  <div id="medPreset-list-view">
+    <div class="modal-title">📋 常用藥品清單</div>
+    <div id="medPresetList"></div>
+    <div style="border-top:1px solid #e4dfd8;padding-top:13px;margin-top:8px">
+      <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="mpf-name" placeholder="抗生素"></div>
+      <div class="two-col">
+        <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="mpf-dose" placeholder="0.5ml"></div>
+        <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="mpf-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
+      </div>
+      <div class="f-group"><label class="f-label">備註</label><input class="f-input" id="mpf-note" placeholder="飯後服用"></div>
+      <button class="pri-btn" style="background:#7b8ec8" onclick="addMedPre()">加入清單</button>
     </div>
-    <div class="f-group"><label class="f-label">備註</label><input class="f-input" id="mpf-note" placeholder="飯後服用"></div>
-    <button class="pri-btn" style="background:#7b8ec8" onclick="addMedPre()">加入清單</button>
+  </div>
+  <div id="medPreset-edit-view" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <button onclick="showMedPreList()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#7b8ec8">←</button>
+      <div class="modal-title" style="margin-bottom:0">✏️ 編輯藥品</div>
+    </div>
+    <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="emp-name"></div>
+    <div class="two-col">
+      <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="emp-dose"></div>
+      <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="emp-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
+    </div>
+    <div class="f-group"><label class="f-label">備註</label><input class="f-input" id="emp-note"></div>
+    <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMedPre()">儲存修改</button>
   </div>
 </div></div>
 
@@ -469,16 +502,32 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div></div>
 
 <div class="modal-bg" id="m-suppPreset" onclick="bgClose(event,'m-suppPreset')"><div class="modal">
-  <div class="modal-handle"></div><div class="modal-title">📋 常用保健品清單</div>
-  <div id="suppPresetList"></div>
-  <div style="border-top:1px solid #e4dfd8;padding-top:13px;margin-top:8px">
-    <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="spf-name" placeholder="益生菌"></div>
-    <div class="two-col">
-      <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="spf-dose" placeholder="1/4茶匙"></div>
-      <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="spf-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
+  <div class="modal-handle"></div>
+  <div id="suppPreset-list-view">
+    <div class="modal-title">📋 常用保健品清單</div>
+    <div id="suppPresetList"></div>
+    <div style="border-top:1px solid #e4dfd8;padding-top:13px;margin-top:8px">
+      <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="spf-name" placeholder="益生菌"></div>
+      <div class="two-col">
+        <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="spf-dose" placeholder="1/4茶匙"></div>
+        <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="spf-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
+      </div>
+      <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="spf-brand" placeholder="Zesty Paws"></div>
+      <button class="pri-btn" style="background:#b07ab8" onclick="addSuppPre()">加入清單</button>
     </div>
-    <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="spf-brand" placeholder="Zesty Paws"></div>
-    <button class="pri-btn" style="background:#b07ab8" onclick="addSuppPre()">加入清單</button>
+  </div>
+  <div id="suppPreset-edit-view" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <button onclick="showSuppPreList()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#b07ab8">←</button>
+      <div class="modal-title" style="margin-bottom:0">✏️ 編輯保健品</div>
+    </div>
+    <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="esp-name"></div>
+    <div class="two-col">
+      <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="esp-dose"></div>
+      <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="esp-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
+    </div>
+    <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="esp-brand"></div>
+    <button class="pri-btn" style="background:#b07ab8" onclick="saveEditSuppPre()">儲存修改</button>
   </div>
 </div></div>
 
@@ -525,55 +574,8 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
     <div class="f-group"><label class="f-label">種類</label><select class="f-select" id="efp-type"><option>主食罐</option><option>副食罐</option><option>乾食</option><option>零食</option><option>水</option></select></div>
     <div class="f-group"><label class="f-label">慣用份量(g)</label><input class="f-input" id="efp-amount" type="number"></div>
   </div>
-  <button class="pri-btn" style="background:#d4a853" onclick="saveEditFoodPre()">儲存修改</button>
-</div></div>
+  <button c
 
-<!-- Edit Med Preset -->
-<div class="modal-bg" id="m-editMedPre" onclick="bgClose(event,'m-editMedPre')"><div class="modal">
-  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用藥品</div>
-  <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="emp-name"></div>
-  <div class="two-col">
-    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="emp-dose"></div>
-    <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="emp-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
-  </div>
-  <div class="f-group"><label class="f-label">備註</label><input class="f-input" id="emp-note"></div>
-  <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMedPre()">儲存修改</button>
-</div></div>
-
-<!-- Edit Supp Preset -->
-<div class="modal-bg" id="m-editSuppPre" onclick="bgClose(event,'m-editSuppPre')"><div class="modal">
-  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用保健品</div>
-  <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="esp-name"></div>
-  <div class="two-col">
-    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="esp-dose"></div>
-    <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="esp-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
-  </div>
-  <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="esp-brand"></div>
-  <button class="pri-btn" style="background:#b07ab8" onclick="saveEditSuppPre()">儲存修改</button>
-</div></div>
-
-<!-- Edit Health Record -->
-<div class="modal-bg" id="m-editHealth" onclick="bgClose(event,'m-editHealth')"><div class="modal">
-  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯健康紀錄</div>
-  <div class="f-group"><label class="f-label">類型</label>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
-      <div class="health-type-btn on" data-v="症狀" onclick="pickEditHealthType(this)">🩺 症狀觀察</div>
-      <div class="health-type-btn" data-v="體重" onclick="pickEditHealthType(this)">⚖️ 體重量測</div>
-      <div class="health-type-btn" data-v="回診" onclick="pickEditHealthType(this)">🏥 定期回診</div>
-      <div class="health-type-btn" data-v="疫苗" onclick="pickEditHealthType(this)">💉 疫苗接種</div>
-    </div>
-  </div>
-  <input type="hidden" id="eh-type" value="症狀">
-  <div class="f-group"><label class="f-label">名稱 / 說明</label><input class="f-input" id="eh-name"></div>
-  <div class="two-col">
-    <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="eh-date-pick"></div></div>
-    <div class="f-group"><label class="f-label">下次預定</label><div class="date-pick" id="eh-next-pick"></div></div>
-  </div>
-  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="eh-note"></textarea></div>
-  <button class="pri-btn" style="background:#7a9e87" onclick="saveEditHealth()">儲存修改</button>
-</div></div>
-
-<script>
 
 
 
@@ -812,6 +814,7 @@ function openModal(type){
     renderFoodQP();
     document.getElementById("m-food").classList.add("open");
   } else if(type==="foodPreset"){
+    showFoodPreList();
     renderFoodPresetList();
     document.getElementById("m-foodPreset").classList.add("open");
   } else if(type==="health"){
@@ -838,6 +841,7 @@ function openModal(type){
     renderMedQP();
     document.getElementById("m-med").classList.add("open");
   } else if(type==="medPreset"){
+    showMedPreList();
     renderMedPresetList();
     document.getElementById("m-medPreset").classList.add("open");
   } else if(type==="poop"){
@@ -859,6 +863,7 @@ function openModal(type){
     renderSuppQP();
     document.getElementById("m-supp").classList.add("open");
   } else if(type==="suppPreset"){
+    showSuppPreList();
     renderSuppPresetList();
     document.getElementById("m-suppPreset").classList.add("open");
   } else if(type==="pet"){
@@ -1611,30 +1616,119 @@ function saveEditHealth(){
 }
 var editFoodPreIdx=-1, editMedPreIdx=-1, editSuppPreIdx=-1;
 
+function showFoodPreList(){ document.getElementById("foodPreset-list-view").style.display=""; document.getElementById("foodPreset-edit-view").style.display="none"; }
+function showMedPreList(){ document.getElementById("medPreset-list-view").style.display=""; document.getElementById("medPreset-edit-view").style.display="none"; }
+function showSuppPreList(){ document.getElementById("suppPreset-list-view").style.display=""; document.getElementById("suppPreset-edit-view").style.display="none"; }
+
 function openEditFoodPre(i){
   editFoodPreIdx=i;
   var p=fPre[i];
-  document.getElementById("efp-name").value=p.name;
-  document.getElementById("efp-type").value=p.type;
+  document.getElementById("efp-name").value=p.name||"";
+  document.getElementById("efp-type").value=p.type||"主食罐";
   document.getElementById("efp-amount").value=p.amount||"";
-  document.getElementById("m-editFoodPre").classList.add("open");
+  document.getElementById("foodPreset-list-view").style.display="none";
+  document.getElementById("foodPreset-edit-view").style.display="";
 }
 function saveEditFoodPre(){
   if(editFoodPreIdx<0)return;
-  fPre[editFoodPreIdx]={
-    name:document.getElementById("efp-name").value,
-    type:document.getElementById("efp-type").value,
-    amount:document.getElementById("efp-amount").value
-  };
+  fPre[editFoodPreIdx]={name:document.getElementById("efp-name").value,type:document.getElementById("efp-type").value,amount:document.getElementById("efp-amount").value};
   editFoodPreIdx=-1;
-  closeModal("m-editFoodPre");
+  showFoodPreList();
   saveDB();renderFoodPresetList();
 }
-
 function openEditMedPre(i){
   editMedPreIdx=i;
   var p=mPre[i];
-  document.getElementById("emp-name").value=p.name;
+  document.getElementById("emp-name").value=p.name||"";
+  document.getElementById("emp-dose").value=p.dose||"";
+  document.getElementById("emp-method").value=p.method||"口服";
+  document.getElementById("emp-note").value=p.note||"";
+  document.getElementById("medPreset-list-view").style.display="none";
+  document.getElementById("medPreset-edit-view").style.display="";
+}
+function saveEditMedPre(){
+  if(editMedPreIdx<0)return;
+  mPre[editMedPreIdx]={name:document.getElementById("emp-name").value,dose:document.getElementById("emp-dose").value,method:document.getElementById("emp-method").value,note:document.getElementById("emp-note").value};
+  editMedPreIdx=-1;
+  showMedPreList();
+  saveDB();renderMedPresetList();renderMedCheckin();
+}
+function openEditSuppPre(i){
+  editSuppPreIdx=i;
+  var p=sPre[i];
+  document.getElementById("esp-name").value=p.name||"";
+  document.getElementById("esp-dose").value=p.dose||"";
+  document.getElementById("esp-type").value=p.type||"其他";
+  document.getElementById("esp-brand").value=p.brand||"";
+  document.getElementById("suppPreset-list-view").style.display="none";
+  document.getElementById("suppPreset-edit-view").style.display="";
+}
+function saveEditSuppPre(){
+  if(editSuppPreIdx<0)return;
+  sPre[editSuppPreIdx]={name:document.getElementById("esp-name").value,dose:document.getElementById("esp-dose").value,type:document.getElementById("esp-type").value,brand:document.getElementById("esp-brand").value};
+  editSuppPreIdx=-1;
+  showSuppPreList();
+  saveDB();renderSuppPresetList();renderSupp();
+}
+
+function renderAll(){
+  renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
+  if(currentTab===6)renderStats();
+}
+// 頁面載入時：先檢查是否跨日，再從紀錄同步打卡狀態
+checkDailyReset();
+// 跨日清空後才從 localStorage 讀取，確保不會載入昨天的打卡狀態
+medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")||"{}");}catch(e){return{};}}());
+syncCheckinFromLogs();
+renderAll();
+
+// ── 事件委派：處理所有 preset 按鈕 ─────────────────────────────────────────
+document.addEventListener("click", function(e){
+  var btn = e.target;
+  while(btn && btn !== document && !btn.getAttribute("data-action")){
+    btn = btn.parentNode;
+  }
+  if(!btn || !btn.getAttribute)return;
+  var action = btn.getAttribute("data-action");
+  if(!action)return;
+  var idx = parseInt(btn.getAttribute("data-idx"), 10);
+  e.stopPropagation();
+  e.preventDefault();
+  if(action==="use-food"){ closeAllModals(); useFoodPreFromList(idx); }
+  else if(action==="edit-food"){ closeAllModals(); openEditFoodPre(idx); }
+  else if(action==="del-food"){ delFoodPre(idx); }
+  else if(action==="use-med"){ closeAllModals(); useMedPreFromList(idx); }
+  else if(action==="edit-med"){ closeAllModals(); openEditMedPre(idx); }
+  else if(action==="del-med"){ delMedPre(idx); }
+  else if(action==="use-supp"){ closeAllModals(); useSuppPreFromList(idx); }
+  else if(action==="edit-supp"){ closeAllModals(); openEditSuppPre(idx); }
+  else if(action==="del-supp"){ delSuppPre(idx); }
+});
+
+function renderAll(){
+  renderHome();renderFood();renderHealth();renderMed();renderPoop();renderSupp();
+  if(currentTab===6)renderStats();
+}
+// 頁面載入時：先檢查是否跨日，再從紀錄同步打卡狀態
+checkDailyReset();
+// 跨日清空後才從 localStorage 讀取，確保不會載入昨天的打卡狀態
+medCheckin=(function(){try{return JSON.parse(localStorage.getItem("medCheckin")||"{}");}catch(e){return{};}}());
+syncCheckinFromLogs();
+renderAll();
+
+// ── 事件委派：處理所有 preset 按鈕 ─────────────────────────────────────────
+
+
+
+
+
+
+
+
+
+
+
+=p.name;
   document.getElementById("emp-dose").value=p.dose||"";
   document.getElementById("emp-method").value=p.method||"口服";
   document.getElementById("emp-note").value=p.note||"";
