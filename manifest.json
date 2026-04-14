@@ -1,0 +1,15 @@
+{
+  "name": "貓咪日記",
+  "short_name": "貓咪日記",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f2ee",
+  "theme_color": "#7a9e87",
+  "icons": [
+    {
+      "src": "180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
