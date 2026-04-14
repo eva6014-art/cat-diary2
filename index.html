@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<link rel="apple-touch-icon" href="180.png"><title>貓咪日記</title>
+<title>貓咪日記</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-height:100vh;display:flex;justify-content:center}
@@ -178,11 +179,13 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 .health-type-btn{padding:10px 8px;border:1.5px solid #e4dfd8;border-radius:10px;font-size:13px;text-align:center;cursor:pointer;background:#f5f2ee;color:#7a766f;transition:all .15s}
 .health-type-btn.on{border-color:#7a9e87;background:#e8f0ea;color:#7a9e87;font-weight:500}
 </style>
+
 </head>
 <body>
 <div class="app">
 
 <!-- HEADER -->
+
 <div class="hdr">
   <div class="hdr-top">
     <div class="pet-row" onclick="openModal('pet')">
@@ -212,9 +215,11 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- CONTENT -->
+
 <div class="content">
 
 <!-- HOME -->
+
 <div class="sec on" id="sec-0">
   <div id="reminders"></div>
   <div class="today-note"><span>✨</span><span id="homeNote">今天是美好的一天！</span></div>
@@ -238,6 +243,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- FOOD -->
+
 <div class="sec" id="sec-1">
   <div class="sec-hdr">
     <div class="sec-title">飲食紀錄</div>
@@ -251,6 +257,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- HEALTH -->
+
 <div class="sec" id="sec-2">
   <div class="sec-hdr">
     <div class="sec-title">健康紀錄</div>
@@ -261,6 +268,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- MED -->
+
 <div class="sec" id="sec-3">
   <div class="sec-hdr">
     <div class="sec-title">用藥紀錄</div>
@@ -278,6 +286,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- POOP -->
+
 <div class="sec" id="sec-4">
   <div class="sec-hdr">
     <div class="sec-title">排便紀錄</div>
@@ -292,6 +301,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- SUPP -->
+
 <div class="sec" id="sec-5">
   <div class="sec-hdr">
     <div class="sec-title">保健食品</div>
@@ -308,6 +318,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div>
 
 <!-- STATS -->
+
 <div class="sec" id="sec-6">
   <div class="period-row">
     <button class="period-btn on" onclick="setPeriod(7,this)">本週</button>
@@ -320,6 +331,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div><!-- /content -->
 
 <!-- BOTTOM NAV -->
+
 <div class="bnav">
   <button class="nav-btn on" onclick="goNav(0,this)"><span class="nav-icon">🏠</span><span class="nav-lbl">總覽</span></button>
   <button class="nav-btn" onclick="goNav(1,this)"><span class="nav-icon">🍖</span><span class="nav-lbl">飲食</span></button>
@@ -332,6 +344,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 </div><!-- /app -->
 
 <!-- MODALS -->
+
 <div class="modal-bg" id="m-pet" onclick="bgClose(event,'m-pet')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯寵物資料</div>
   <div class="f-group"><label class="f-label">名字</label><input class="f-input" id="pef-name" placeholder="小橘"></div>
@@ -565,8 +578,8 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
   <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMed()">儲存修改</button>
 </div></div>
 
-
 <!-- Edit Food Preset -->
+
 <div class="modal-bg" id="m-editFoodPre" onclick="bgClose(event,'m-editFoodPre')"><div class="modal">
   <div class="modal-handle"></div><div class="modal-title">✏️ 編輯常用食物</div>
   <div class="f-group"><label class="f-label">品牌 / 名稱</label><input class="f-input" id="efp-name"></div>
@@ -581,6 +594,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 <div class="toast" id="toast">💾 已自動儲存</div>
 
 <script>
+
 //
 
 
@@ -1462,7 +1476,7 @@ function renderSupp(){
   if(!sarr.length){sl.appendChild(emptyEl("🌿","點右上角 + 新增"));return;}
   appendDateGroup(sl,sarr,function(l,idx){
     var origIdx=supp.indexOf(l);idx=origIdx>=0?origIdx:idx;
-    return makeLcWrap(SICONS[l.type]||"🌿","#f5edf8",l.name,l.type+" · "+l.dose+(l.note?" · "+l.note:""),fmtD(l.date)+" "+l.time,"del('supp',"+idx+")",null);
+    return makeLcWrap(SICONS[l.type]||"🌿","#f5edf8",l.name,l.type+" · "+l.dose+(l.note?" · "+l.note:""),fmtD(l.date)+" "+l.time,"del('supp',"+idx+")","openEditSupp("+idx+")");
   });
 }
 
@@ -1609,6 +1623,35 @@ function saveEditHealth(){
   closeModal("m-editHealth");
   saveDB();renderAll();
 }
+
+var editSuppIdx=-1;
+function openEditSupp(idx){
+  editSuppIdx=idx;
+  var l=supp[idx];
+  document.getElementById("es-name").value=l.name||"";
+  document.getElementById("es-type").value=l.type||"腸胃保健";
+  document.getElementById("es-dose").value=l.dose||"";
+  document.getElementById("es-brand").value=l.brand||"";
+  document.getElementById("es-time").value=l.time||"";
+  document.getElementById("es-note").value=l.note||"";
+  makeDatePick("es-date-pick",l.date||todayStr());
+  document.getElementById("m-edit-supp").classList.add("open");
+}
+function saveEditSupp(){
+  if(editSuppIdx<0)return;
+  supp[editSuppIdx]={
+    name:document.getElementById("es-name").value,
+    type:document.getElementById("es-type").value,
+    dose:document.getElementById("es-dose").value,
+    brand:document.getElementById("es-brand").value,
+    time:document.getElementById("es-time").value,
+    note:document.getElementById("es-note").value,
+    date:getDP("es-date-pick")||todayStr()
+  };
+  editSuppIdx=-1;
+  closeModal("m-edit-supp");
+  saveDB();renderAll();
+}
 var editFoodPreIdx=-1, editMedPreIdx=-1, editSuppPreIdx=-1;
 
 function showFoodPreList(){ document.getElementById("foodPreset-list-view").style.display=""; document.getElementById("foodPreset-edit-view").style.display="none"; }
@@ -1697,8 +1740,23 @@ document.addEventListener("click", function(e){
   else if(action==="edit-supp"){ openEditSuppPre(idx); }
   else if(action==="del-supp"){ delSuppPre(idx); }
 });
+
 </script>
 
+<!-- Edit Supp Record -->
 
+<div class="modal-bg" id="m-edit-supp" onclick="bgClose(event,'m-edit-supp')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯保健紀錄</div>
+  <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="es-name"></div>
+  <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="es-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="es-dose"></div>
+    <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="es-time" type="time"></div>
+  </div>
+  <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="es-date-pick"></div></div>
+  <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="es-brand"></div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="es-note"></textarea></div>
+  <button class="pri-btn" style="background:#b07ab8" onclick="saveEditSupp()">儲存修改</button>
+</div></div>
 </body>
 </html>
