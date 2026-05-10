@@ -398,6 +398,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 
 
+
 function closeAllModals(){
   document.querySelectorAll(".modal-bg").forEach(function(m){
     m.classList.remove("open");
@@ -727,54 +728,49 @@ function makeLcWrap(icon,bg,titleTxt,detailTxt,timeStr,delFn,editFn){
   div.className="lc-wrap";
   div.setAttribute("data-editfn",editFn||"");
   div.onclick=function(){toggleLC(this);};
-  var lc=document.createElement("div");
-  lc.className="lc";
-  var iconDiv=document.createElement("div");
-  iconDiv.className="log-icon";
-  iconDiv.style.background=bg;
-  iconDiv.textContent=icon;
-  var body=document.createElement("div");
-  body.className="log-body";
-  var t=document.createElement("div");
-  t.className="log-title";
-  t.textContent=titleTxt;
-  var det=document.createElement("div");
-  det.className="log-detail";
-  det.textContent=detailTxt;
+  var lc=document.createElement("div");lc.className="lc";
+  var iconDiv=document.createElement("div");iconDiv.className="log-icon";iconDiv.style.background=bg;iconDiv.textContent=icon;
+  var body=document.createElement("div");body.className="log-body";
+  var t=document.createElement("div");t.className="log-title";t.textContent=titleTxt;
+  var det=document.createElement("div");det.className="log-detail";det.textContent=detailTxt;
   body.appendChild(t);body.appendChild(det);
-  var tm=document.createElement("div");
-  tm.className="log-time";
-  tm.textContent=timeStr;
+  var tm=document.createElement("div");tm.className="log-time";tm.textContent=timeStr;
   lc.appendChild(iconDiv);lc.appendChild(body);lc.appendChild(tm);
-  var acts=document.createElement("div");
-  acts.className="lc-actions";
+  var acts=document.createElement("div");acts.className="lc-actions";
   if(editFn){
-    var eb=document.createElement("button");
-    eb.className="lc-edit";
-    eb.innerHTML="✏️";
-    (function(d,fn){
-      eb.onclick=function(e){
-        e.stopPropagation();
-        d.classList.remove("open","open-s");
-        window[fn.split("(")[0]](parseInt(fn.match(/\d+/)[0]));
-      };
-    })(div,editFn);
+    var eb=document.createElement("button");eb.className="lc-edit";eb.innerHTML="✏️";
+    eb.setAttribute("data-fn",editFn);
+    eb.onclick=function(e){
+      e.stopPropagation();
+      div.classList.remove("open","open-s");
+      lcDispatch(this.getAttribute("data-fn"));
+    };
     acts.appendChild(eb);
   }
-  var db=document.createElement("button");
-  db.className="lc-del";
-  db.innerHTML="🗑️";
-  (function(d,fn){
-    db.onclick=function(e){
-      e.stopPropagation();
-      d.classList.remove("open","open-s");
-      var m=fn.match(/del\('(\w+)',(\d+)\)/);
-      if(m)del(m[1],parseInt(m[2]));
-    };
-  })(div,delFn);
+  var db=document.createElement("button");db.className="lc-del";db.innerHTML="🗑️";
+  db.setAttribute("data-fn",delFn);
+  db.onclick=function(e){
+    e.stopPropagation();
+    div.classList.remove("open","open-s");
+    lcDispatch(this.getAttribute("data-fn"));
+  };
   acts.appendChild(db);
   div.appendChild(lc);div.appendChild(acts);
   return div;
+}
+function lcDispatch(fn){
+  if(!fn)return;
+  // del('food',3) or openEditFood(3)
+  var delM=fn.match(/^del\('(\w+)',(\d+)\)$/);
+  if(delM){del(delM[1],parseInt(delM[2]));return;}
+  var editM=fn.match(/^(\w+)\((\d+)\)$/);
+  if(editM){
+    var name=editM[1],idx=parseInt(editM[2]);
+    if(name==="openEditFood")openEditFood(idx);
+    else if(name==="openEditHealth")openEditHealth(idx);
+    else if(name==="openEditMed")openEditMed(idx);
+    else if(name==="openEditSupp")openEditSupp(idx);
+  }
 }
 function toggleLC(w){
   var was=w.classList.contains("open")||w.classList.contains("open-s");
@@ -1551,6 +1547,7 @@ document.addEventListener("click", function(e){
   else if(action==="edit-supp"){ openEditSuppPre(idx); }
   else if(action==="del-supp"){ delSuppPre(idx); }
 });
+
 
 
 
