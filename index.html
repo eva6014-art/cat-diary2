@@ -397,6 +397,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 
 
+
 function closeAllModals(){
   document.querySelectorAll(".modal-bg").forEach(function(m){
     m.classList.remove("open");
@@ -750,14 +751,27 @@ function makeLcWrap(icon,bg,titleTxt,detailTxt,timeStr,delFn,editFn){
   if(editFn){
     var eb=document.createElement("button");
     eb.className="lc-edit";
-    eb.textContent="✏️";
-    eb.setAttribute("onclick",editFn);
+    eb.innerHTML="✏️";
+    (function(d,fn){
+      eb.onclick=function(e){
+        e.stopPropagation();
+        d.classList.remove("open","open-s");
+        window[fn.split("(")[0]](parseInt(fn.match(/\d+/)[0]));
+      };
+    })(div,editFn);
     acts.appendChild(eb);
   }
   var db=document.createElement("button");
   db.className="lc-del";
-  db.textContent="🗑️";
-  db.setAttribute("onclick",delFn);
+  db.innerHTML="🗑️";
+  (function(d,fn){
+    db.onclick=function(e){
+      e.stopPropagation();
+      d.classList.remove("open","open-s");
+      var m=fn.match(/del\('(\w+)',(\d+)\)/);
+      if(m)del(m[1],parseInt(m[2]));
+    };
+  })(div,delFn);
   acts.appendChild(db);
   div.appendChild(lc);div.appendChild(acts);
   return div;
@@ -1238,7 +1252,7 @@ function renderPoop(){
       +"<div class='log-time'>"+fmtD(l.date)+" "+l.time+"</div>";
     var acts=document.createElement("div");acts.className="lc-actions";
     var db=document.createElement("button");db.className="lc-del";db.textContent="🗑️";
-    (function(i){db.onclick=function(e){e.stopPropagation();toggleLC(wrap);del("poop",i);};})(idx);
+    (function(i,w){db.onclick=function(e){e.stopPropagation();w.classList.remove("open","open-s");del("poop",i);};})(idx,wrap);
     acts.appendChild(db);wrap.appendChild(lc);wrap.appendChild(acts);el.appendChild(wrap);
   });
 }
@@ -1537,6 +1551,7 @@ document.addEventListener("click", function(e){
   else if(action==="edit-supp"){ openEditSuppPre(idx); }
   else if(action==="del-supp"){ delSuppPre(idx); }
 });
+
 
 
 
