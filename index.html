@@ -392,6 +392,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 <div class="toast" id="toast">💾 已自動儲存</div>
 
 <script>
+
 function closeAllModals(){
   document.querySelectorAll(".modal-bg").forEach(function(m){
     m.classList.remove("open");
@@ -746,13 +747,13 @@ function makeLcWrap(icon,bg,titleTxt,detailTxt,timeStr,delFn,editFn){
     var eb=document.createElement("button");
     eb.className="lc-edit";
     eb.textContent="✏️";
-    eb.onclick=function(e){e.stopPropagation();toggleLC(div);eval(editFn);};
+    eb.setAttribute("onclick","event.stopPropagation();"+editFn);
     acts.appendChild(eb);
   }
   var db=document.createElement("button");
   db.className="lc-del";
   db.textContent="🗑️";
-  db.onclick=function(e){e.stopPropagation();toggleLC(div);eval(delFn);};
+  db.setAttribute("onclick","event.stopPropagation();"+delFn);
   acts.appendChild(db);
   div.appendChild(lc);div.appendChild(acts);
   return div;
@@ -1532,6 +1533,7 @@ document.addEventListener("click", function(e){
   else if(action==="edit-supp"){ openEditSuppPre(idx); }
   else if(action==="del-supp"){ delSuppPre(idx); }
 });
+
 
 
 </script>
