@@ -393,7 +393,231 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 <div class="toast" id="toast">💾 已自動儲存</div>
 
+<!-- Edit Food Record -->
+<div class="modal-bg" id="m-edit-food" onclick="bgClose(event,'m-edit-food')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯飲食紀錄</div>
+  <div class="f-group"><label class="f-label">食物種類</label><select class="f-select" id="ef-type"><option>主食罐</option><option>副食罐</option><option>乾食</option><option>零食</option><option>水</option></select></div>
+  <div class="f-group"><label class="f-label">品牌 / 名稱</label><input class="f-input" id="ef-name"></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">份量(g/ml)</label><input class="f-input" id="ef-amount" type="number"></div>
+    <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="ef-time" type="time"></div>
+  </div>
+  <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="ef-date-pick"></div></div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="ef-note"></textarea></div>
+  <button class="pri-btn" style="background:#7a9e87" onclick="saveEditFood()">儲存修改</button>
+</div></div>
+
+<!-- Health Modal -->
+<div class="modal-bg" id="m-health" onclick="bgClose(event,'m-health')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title" id="healthModalTitle">💉 新增健康紀錄</div>
+  <input type="hidden" id="hf-type" value="症狀">
+  <div class="f-group"><label class="f-label">類型</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+      <div class="health-type-btn on" data-v="症狀" onclick="pickHealthType(this)">🩺 症狀觀察</div>
+      <div class="health-type-btn" data-v="體重" onclick="pickHealthType(this)">⚖️ 體重量測</div>
+      <div class="health-type-btn" data-v="回診" onclick="pickHealthType(this)">🏥 定期回診</div>
+      <div class="health-type-btn" data-v="疫苗" onclick="pickHealthType(this)">💉 疫苗接種</div>
+    </div>
+  </div>
+  <div class="f-group" id="hf-name-group"><label class="f-label">名稱 / 說明</label><input class="f-input" id="hf-name" placeholder="e.g. 黃鼻涕、三合一疫苗"></div>
+  <div class="f-group" id="hf-wt-group" style="display:none"><label class="f-label">體重（kg）</label><div class="wt-input-row"><input type="number" step="0.1" id="hf-wt" placeholder="4.2"><span>kg</span></div></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="hf-date-pick"></div></div>
+    <div class="f-group"><label class="f-label">下次預定</label><div class="date-pick" id="hf-next-pick"></div></div>
+  </div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="hf-note" placeholder="醫生說的話..."></textarea></div>
+  <button class="pri-btn" style="background:#7a9e87" onclick="saveHealth()">儲存</button>
+</div></div>
+
+<!-- Edit Health Record -->
+<div class="modal-bg" id="m-editHealth" onclick="bgClose(event,'m-editHealth')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯健康紀錄</div>
+  <div class="f-group"><label class="f-label">類型</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+      <div class="health-type-btn on" data-v="症狀" onclick="pickEditHealthType(this)">🩺 症狀觀察</div>
+      <div class="health-type-btn" data-v="體重" onclick="pickEditHealthType(this)">⚖️ 體重量測</div>
+      <div class="health-type-btn" data-v="回診" onclick="pickEditHealthType(this)">🏥 定期回診</div>
+      <div class="health-type-btn" data-v="疫苗" onclick="pickEditHealthType(this)">💉 疫苗接種</div>
+    </div>
+  </div>
+  <input type="hidden" id="eh-type" value="症狀">
+  <div class="f-group"><label class="f-label">名稱 / 說明</label><input class="f-input" id="eh-name"></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="eh-date-pick"></div></div>
+    <div class="f-group"><label class="f-label">下次預定</label><div class="date-pick" id="eh-next-pick"></div></div>
+  </div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="eh-note"></textarea></div>
+  <button class="pri-btn" style="background:#7a9e87" onclick="saveEditHealth()">儲存修改</button>
+</div></div>
+
+<!-- Med Modal -->
+<div class="modal-bg" id="m-med" onclick="bgClose(event,'m-med')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title" id="medModalTitle">💊 新增用藥紀錄</div>
+  <div id="medQP"></div>
+  <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="mf-name" placeholder="e.g. 抗生素"></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="mf-dose" placeholder="0.5ml"></div>
+    <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="mf-time" type="time"></div>
+  </div>
+  <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="mf-date-pick"></div></div>
+  <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="mf-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="mf-note" placeholder="飯後服用，連續7天..."></textarea></div>
+  <button class="pri-btn" style="background:#7b8ec8" onclick="saveMed()">儲存</button>
+</div></div>
+
+<!-- Edit Med Record -->
+<div class="modal-bg" id="m-edit-med" onclick="bgClose(event,'m-edit-med')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯用藥紀錄</div>
+  <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="em-name"></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="em-dose"></div>
+    <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="em-time" type="time"></div>
+  </div>
+  <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="em-date-pick"></div></div>
+  <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="em-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="em-note"></textarea></div>
+  <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMed()">儲存修改</button>
+</div></div>
+
+<!-- Med Preset Modal -->
+<div class="modal-bg" id="m-medPreset" onclick="bgClose(event,'m-medPreset')"><div class="modal">
+  <div class="modal-handle"></div>
+  <div id="medPreset-list-view">
+    <div class="modal-title">📋 常用藥品清單</div>
+    <div id="medPresetList"></div>
+    <div style="border-top:1px solid #e4dfd8;padding-top:13px;margin-top:8px">
+      <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="mpf-name" placeholder="抗生素"></div>
+      <div class="two-col">
+        <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="mpf-dose" placeholder="0.5ml"></div>
+        <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="mpf-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
+      </div>
+      <div class="f-group"><label class="f-label">備註</label><input class="f-input" id="mpf-note" placeholder="飯後服用"></div>
+      <button class="pri-btn" style="background:#7b8ec8" onclick="addMedPre()">加入清單</button>
+    </div>
+  </div>
+  <div id="medPreset-edit-view" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <button onclick="showMedPreList()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#7b8ec8">←</button>
+      <div class="modal-title" style="margin-bottom:0">✏️ 編輯藥品</div>
+    </div>
+    <div class="f-group"><label class="f-label">藥物名稱</label><input class="f-input" id="emp-name"></div>
+    <div class="two-col">
+      <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="emp-dose"></div>
+      <div class="f-group"><label class="f-label">方式</label><select class="f-select" id="emp-method"><option>口服</option><option>混入食物</option><option>外用塗抹</option><option>滴耳</option><option>滴眼</option><option>注射</option></select></div>
+    </div>
+    <div class="f-group"><label class="f-label">備註</label><input class="f-input" id="emp-note"></div>
+    <button class="pri-btn" style="background:#7b8ec8" onclick="saveEditMedPre()">儲存修改</button>
+  </div>
+</div></div>
+
+<!-- Poop Modal -->
+<div class="modal-bg" id="m-poop" onclick="bgClose(event,'m-poop')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">🚽 新增排便紀錄</div>
+  <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="pf-date-pick"></div></div>
+  <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="pf-time" type="time"></div>
+  <div class="f-group"><label class="f-label">形狀 / 質地</label>
+    <div class="poop-opts">
+      <div class="poop-opt on" data-v="正常" onclick="selPoop(this)">💩 正常</div>
+      <div class="poop-opt" data-v="偏軟" onclick="selPoop(this)">🙂 偏軟</div>
+      <div class="poop-opt" data-v="拉稀" onclick="selPoop(this)">💧 拉稀</div>
+      <div class="poop-opt" data-v="偏硬" onclick="selPoop(this)">🪨 偏硬</div>
+      <div class="poop-opt" data-v="有血" onclick="selPoop(this)">🔴 有血</div>
+      <div class="poop-opt" data-v="黏液" onclick="selPoop(this)">🫧 黏液</div>
+    </div>
+  </div>
+  <div class="f-group"><label class="f-label">顏色</label>
+    <div class="color-row">
+      <div class="color-dot on" data-v="棕色" style="background:#8B4513" onclick="selColor(this)"></div>
+      <div class="color-dot" data-v="深棕" style="background:#4a2800" onclick="selColor(this)"></div>
+      <div class="color-dot" data-v="黃棕" style="background:#c8a96e" onclick="selColor(this)"></div>
+      <div class="color-dot" data-v="黑色" style="background:#222" onclick="selColor(this)"></div>
+      <div class="color-dot" data-v="紅色" style="background:#c0392b" onclick="selColor(this)"></div>
+      <div class="color-dot" data-v="灰白" style="background:#ccc" onclick="selColor(this)"></div>
+    </div>
+  </div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="pf-note" placeholder="觀察到的特別情況..."></textarea></div>
+  <button class="pri-btn" style="background:#a07850" onclick="savePoop()">儲存</button>
+</div></div>
+
+<!-- Supp Modal -->
+<div class="modal-bg" id="m-supp" onclick="bgClose(event,'m-supp')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">🌿 新增保健食品</div>
+  <div id="suppQP"></div>
+  <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="sf-name" placeholder="e.g. 益生菌"></div>
+  <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="sf-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="sf-dose" placeholder="1/4茶匙"></div>
+    <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="sf-time" type="time"></div>
+  </div>
+  <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="sf-date-pick"></div></div>
+  <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="sf-brand" placeholder="Zesty Paws"></div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="sf-note" placeholder="觀察到的效果..."></textarea></div>
+  <button class="pri-btn" style="background:#b07ab8" onclick="saveSupp()">儲存</button>
+</div></div>
+
+<!-- Supp Preset Modal -->
+<div class="modal-bg" id="m-suppPreset" onclick="bgClose(event,'m-suppPreset')"><div class="modal">
+  <div class="modal-handle"></div>
+  <div id="suppPreset-list-view">
+    <div class="modal-title">📋 常用保健品清單</div>
+    <div id="suppPresetList"></div>
+    <div style="border-top:1px solid #e4dfd8;padding-top:13px;margin-top:8px">
+      <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="spf-name" placeholder="益生菌"></div>
+      <div class="two-col">
+        <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="spf-dose" placeholder="1/4茶匙"></div>
+        <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="spf-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
+      </div>
+      <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="spf-brand" placeholder="Zesty Paws"></div>
+      <button class="pri-btn" style="background:#b07ab8" onclick="addSuppPre()">加入清單</button>
+    </div>
+  </div>
+  <div id="suppPreset-edit-view" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <button onclick="showSuppPreList()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#b07ab8">←</button>
+      <div class="modal-title" style="margin-bottom:0">✏️ 編輯保健品</div>
+    </div>
+    <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="esp-name"></div>
+    <div class="two-col">
+      <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="esp-dose"></div>
+      <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="esp-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
+    </div>
+    <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="esp-brand"></div>
+    <button class="pri-btn" style="background:#b07ab8" onclick="saveEditSuppPre()">儲存修改</button>
+  </div>
+</div></div>
+
+<!-- Confirm Delete Modal -->
+<div class="modal-bg" id="m-confirm" onclick="bgClose(event,'m-confirm')"><div class="modal">
+  <div class="modal-handle"></div>
+  <div style="text-align:center;padding:10px 0 20px">
+    <div style="font-size:36px;margin-bottom:12px">🗑️</div>
+    <div style="font-size:16px;font-weight:600;color:#2d2a26;margin-bottom:8px">確定要刪除？</div>
+    <div style="font-size:13px;color:#b0aa9f;margin-bottom:20px">此操作無法復原</div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeModal('m-confirm')" style="flex:1;padding:12px;border:1.5px solid #e4dfd8;border-radius:12px;background:#fdfbf8;color:#7a766f;font-size:14px;cursor:pointer">取消</button>
+      <button onclick="doDelete()" style="flex:1;padding:12px;border:none;border-radius:12px;background:#e07e6a;color:white;font-size:14px;font-weight:600;cursor:pointer">刪除</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- Edit Supp Record -->
+<div class="modal-bg" id="m-edit-supp" onclick="bgClose(event,'m-edit-supp')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯保健紀錄</div>
+  <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="es-name"></div>
+  <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="es-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
+  <div class="two-col">
+    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="es-dose"></div>
+    <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="es-time" type="time"></div>
+  </div>
+  <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="es-date-pick"></div></div>
+  <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="es-brand"></div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="es-note"></textarea></div>
+  <button class="pri-btn" style="background:#b07ab8" onclick="saveEditSupp()">儲存修改</button>
+</div></div>
+
+
 <script>
+
 
 
 
@@ -839,6 +1063,7 @@ function openEditFood(idx){
   document.getElementById("ef-amount").value=(l.amount||"").replace("g","");
   document.getElementById("ef-time").value=l.time;
   document.getElementById("ef-note").value=l.note||"";
+  makeDatePick("ef-date-pick",l.date||todayStr());
   document.getElementById("m-edit-food").classList.add("open");
 }
 function saveEditFood(){
@@ -931,6 +1156,7 @@ function openEditMed(idx){
   document.getElementById("em-time").value=l.time;
   document.getElementById("em-method").value=l.method||"口服";
   document.getElementById("em-note").value=l.note||"";
+  makeDatePick("em-date-pick",l.date||todayStr());
   document.getElementById("m-edit-med").classList.add("open");
 }
 function saveEditMed(){
@@ -1554,20 +1780,13 @@ document.addEventListener("click", function(e){
 
 
 
+
 </script>
 
 
 
 <!-- Edit Supp Record -->
-<div class="modal-bg" id="m-edit-supp" onclick="bgClose(event,'m-edit-supp')"><div class="modal">
-  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯保健紀錄</div>
-  <div class="f-group"><label class="f-label">名稱</label><input class="f-input" id="es-name"></div>
-  <div class="f-group"><label class="f-label">類型</label><select class="f-select" id="es-type"><option>腸胃保健</option><option>免疫力</option><option>關節保健</option><option>皮毛保養</option><option>泌尿保健</option><option>眼睛保健</option><option>護肝</option><option>護腎</option><option>其他</option></select></div>
-  <div class="two-col">
-    <div class="f-group"><label class="f-label">劑量</label><input class="f-input" id="es-dose"></div>
-    <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="es-time" type="time"></div>
-  </div>
-  <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="es-date-pick"></div></div>
+
   <div class="f-group"><label class="f-label">品牌</label><input class="f-input" id="es-brand"></div>
   <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="es-note"></textarea></div>
   <button class="pri-btn" style="background:#b07ab8" onclick="saveEditSupp()">儲存修改</button>
