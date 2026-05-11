@@ -623,6 +623,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 
 
+
 function closeAllModals(){
   document.querySelectorAll(".modal-bg").forEach(function(m){
     m.classList.remove("open");
@@ -1068,7 +1069,7 @@ function openEditFood(idx){
 }
 function saveEditFood(){
   var amount=document.getElementById("ef-amount").value;
-  food[editFoodIdx]={type:document.getElementById("ef-type").value,name:document.getElementById("ef-name").value,amount:amount?amount+"g":"",time:document.getElementById("ef-time").value,note:document.getElementById("ef-note").value,date:food[editFoodIdx].date};
+  food[editFoodIdx]={type:document.getElementById("ef-type").value,name:document.getElementById("ef-name").value,amount:amount?amount+"g":"",time:document.getElementById("ef-time").value,note:document.getElementById("ef-note").value,date:getDP("ef-date-pick")||food[editFoodIdx].date||todayStr()};
   editFoodIdx=-1;closeModal("m-edit-food");saveDB();renderAll();
 }
 function renderFoodQP(){
@@ -1773,6 +1774,7 @@ document.addEventListener("click", function(e){
   else if(action==="edit-supp"){ openEditSuppPre(idx); }
   else if(action==="del-supp"){ delSuppPre(idx); }
 });
+
 
 
 
