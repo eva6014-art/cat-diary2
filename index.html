@@ -624,6 +624,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f5f2ee;color:#2d2a26;min-
 
 
 
+
 function closeAllModals(){
   document.querySelectorAll(".modal-bg").forEach(function(m){
     m.classList.remove("open");
@@ -1211,6 +1212,45 @@ function renderMedPresetList(){
 function useMedPreFromList(i){closeModal("m-medPreset");openModal("med");useMedPre(i);}
 function delMedPre(i){mPre.splice(i,1);saveDB();renderMedPresetList();}
 
+
+function selPoop(el){
+  document.querySelectorAll(".poop-opt").forEach(function(o){o.classList.remove("on");});
+  el.classList.add("on");
+}
+function selColor(el){
+  document.querySelectorAll(".color-dot").forEach(function(o){o.classList.remove("on");});
+  el.classList.add("on");
+}
+
+var editPoopIdx=-1;
+function openEditPoop(idx){
+  editPoopIdx=idx;
+  var l=poop[idx];
+  makeDatePick("ep-date-pick",l.date||todayStr());
+  document.getElementById("ep-time").value=l.time||"";
+  document.querySelectorAll("#m-edit-poop .poop-opt").forEach(function(o){
+    o.classList.toggle("on", o.getAttribute("data-v")===l.shape);
+  });
+  document.querySelectorAll("#m-edit-poop .color-dot").forEach(function(o){
+    o.classList.toggle("on", o.getAttribute("data-v")===l.color);
+  });
+  document.getElementById("ep-note").value=l.note||"";
+  document.getElementById("m-edit-poop").classList.add("open");
+}
+function saveEditPoop(){
+  if(editPoopIdx<0)return;
+  var shape=(document.querySelector("#m-edit-poop .poop-opt.on")||{dataset:{v:"正常"}}).dataset.v;
+  var color=(document.querySelector("#m-edit-poop .color-dot.on")||{dataset:{v:"棕色"}}).dataset.v;
+  poop[editPoopIdx]={
+    shape:shape, color:color,
+    time:document.getElementById("ep-time").value,
+    note:document.getElementById("ep-note").value,
+    date:getDP("ep-date-pick")||poop[editPoopIdx].date||todayStr()
+  };
+  editPoopIdx=-1;
+  closeModal("m-edit-poop");
+  saveDB();renderAll();
+}
 function savePoop(){
   var shape=(document.querySelector(".poop-opt.on")||{dataset:{v:"正常"}}).dataset.v;
   var color=(document.querySelector(".color-dot.on")||{dataset:{v:"棕色"}}).dataset.v;
@@ -1474,9 +1514,11 @@ function renderPoop(){
       +"</div></div>"
       +"<div class='log-time'>"+fmtD(l.date)+" "+l.time+"</div>";
     var acts=document.createElement("div");acts.className="lc-actions";
+    var eb=document.createElement("button");eb.className="lc-edit";eb.textContent="✏️";
+    (function(i,w){eb.onclick=function(e){e.stopPropagation();w.classList.remove("open","open-s");openEditPoop(i);};})(idx,wrap);
     var db=document.createElement("button");db.className="lc-del";db.textContent="🗑️";
     (function(i,w){db.onclick=function(e){e.stopPropagation();w.classList.remove("open","open-s");del("poop",i);};})(idx,wrap);
-    acts.appendChild(db);wrap.appendChild(lc);wrap.appendChild(acts);el.appendChild(wrap);
+    acts.appendChild(eb);acts.appendChild(db);wrap.appendChild(lc);wrap.appendChild(acts);el.appendChild(wrap);
   });
 }
 
@@ -1783,7 +1825,37 @@ document.addEventListener("click", function(e){
 
 
 
+
 </script>
 
+
+<!-- Edit Poop Record -->
+<div class="modal-bg" id="m-edit-poop" onclick="bgClose(event,'m-edit-poop')"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">✏️ 編輯排便紀錄</div>
+  <div class="f-group"><label class="f-label">日期</label><div class="date-pick" id="ep-date-pick"></div></div>
+  <div class="f-group"><label class="f-label">時間</label><input class="f-input" id="ep-time" type="time"></div>
+  <div class="f-group"><label class="f-label">形狀 / 質地</label>
+    <div class="poop-opts">
+      <div class="poop-opt on" data-v="正常" onclick="selPoop(this)">💩 正常</div>
+      <div class="poop-opt" data-v="偏軟" onclick="selPoop(this)">🙂 偏軟</div>
+      <div class="poop-opt" data-v="拉稀" onclick="selPoop(this)">💧 拉稀</div>
+      <div class="poop-opt" data-v="偏硬" onclick="selPoop(this)">🪨 偏硬</div>
+      <div class="poop-opt" data-v="有血" onclick="selPoop(this)">🔴 有血</div>
+      <div class="poop-opt" data-v="黏液" onclick="selPoop(this)">🫧 黏液</div>
+    </div>
+  </div>
+  <div class="f-group"><label class="f-label">顏色</label>
+    <div class="color-row">
+      <div class="color-dot on" data-v="棕色" style="background:#8B4513" onclick="selColor(this)"></div>
+      <div class="color-dot" data-v="深棕" style="background:#4a2800" onclick="selColor(this)"></div>
+      <div class="color-dot" data-v="黃棕" style="background:#c8a96e" onclick="selColor(this)"></div>
+      <div class="color-dot" data-v="黑色" style="background:#222" onclick="selColor(this)"></div>
+      <div class="color-dot" data-v="紅色" style="background:#c0392b" onclick="selColor(this)"></div>
+      <div class="color-dot" data-v="灰白" style="background:#ccc" onclick="selColor(this)"></div>
+    </div>
+  </div>
+  <div class="f-group"><label class="f-label">備註</label><textarea class="f-textarea" id="ep-note" placeholder="觀察到的特別情況..."></textarea></div>
+  <button class="pri-btn" style="background:#a07850" onclick="saveEditPoop()">儲存修改</button>
+</div></div>
 </body>
 </html>
